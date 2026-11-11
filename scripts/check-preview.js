@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { chromium } from "playwright";
+import { loadReplay } from "../packages/core/index.js";
 
 const cli = fileURLToPath(new URL("../packages/cli/index.js", import.meta.url));
 
@@ -22,7 +23,7 @@ async function checkGeneratedInputs(generated, checkedIn) {
   }
 }
 
-async function checkFixture(browser, file, expected, inspect) {
+async function openOfflinePreview(browser, file) {
   const page = await browser.newPage({ viewport: { width: 1000, height: 740 } });
   const requests = [];
   const errors = [];
@@ -32,11 +33,40 @@ async function checkFixture(browser, file, expected, inspect) {
     await route.abort();
   });
   await page.goto(pathToFileURL(file).href);
-  if (inspect) await page.locator("#state-panel summary").click();
+  return { page, requests, errors };
+}
 
+async function checkNavigation(page, count, checkStep) {
   const previous = page.getByRole("button", { name: "Previous" });
   const next = page.getByRole("button", { name: "Next" });
   const seek = page.getByRole("slider", { name: "Seek" });
+  assert(await previous.isDisabled());
+  for (let index = 0; index < count; index++) {
+    if (index > 0) await next.click();
+    await checkStep(index);
+  }
+  assert(await next.isDisabled());
+  for (let index = count - 2; index >= 0; index--) {
+    await previous.click();
+    await checkStep(index);
+  }
+  for (let index = count - 1; index > 0; index--) {
+    await seek.fill(String(index));
+    await checkStep(index);
+  }
+  await seek.press("Home");
+  await checkStep(0);
+}
+
+async function openStatePanel(page) {
+  await page.locator("#state-panel summary").click();
+  await page.locator("#state-json").filter({ hasText: "{" }).waitFor();
+}
+
+async function checkFixture(browser, file, expected, inspect) {
+  const { page, requests, errors } = await openOfflinePreview(browser, file);
+  if (inspect) await openStatePanel(page);
+
   const positions = await page.locator("[data-node-id]").evaluateAll((nodes) => nodes.map((node) => node.getAttribute("transform")));
   const edgeLabels = expected.edges.filter((edge) => edge.label !== undefined).map((edge) => ({ id: edge.id, label: String(edge.label) }));
 
@@ -65,22 +95,7 @@ async function checkFixture(browser, file, expected, inspect) {
     if (inspect) await inspect(page, index);
   }
 
-  assert(await previous.isDisabled());
-  for (let index = 0; index < expected.steps.length; index++) {
-    if (index > 0) await next.click();
-    await checkStep(index);
-  }
-  assert(await next.isDisabled());
-  for (let index = expected.steps.length - 2; index >= 0; index--) {
-    await previous.click();
-    await checkStep(index);
-  }
-  for (let index = expected.steps.length - 1; index > 0; index--) {
-    await seek.fill(String(index));
-    await checkStep(index);
-  }
-  await seek.press("Home");
-  await checkStep(0);
+  await checkNavigation(page, expected.steps.length, checkStep);
 
   await page.setViewportSize({ width: 375, height: 812 });
   assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
@@ -230,4 +245,72 @@ test("the weighted Dijkstra example uses native views across all five offline fr
       assert.equal(await change.locator('[data-change-side="after"]').textContent(), "2");
     }
   });
+});
+
+test("knapsack replays the returned DP rows and their changes with an editable input", async (t) => {
+  const fixture = new URL("../examples/knapsack/", import.meta.url);
+  const input = JSON.parse(await readFile(new URL("input.json", fixture), "utf8"));
+  const rows = [
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 6, 6, 6, 6, 6],
+    [0, 0, 6, 10, 10, 16, 16],
+    [0, 0, 6, 10, 12, 16, 18],
+  ];
+  const directory = await mkdtemp(join(tmpdir(), "algoviz-knapsack-"));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const adapter = fileURLToPath(new URL("adapter.py", fixture));
+  const python = process.env.ALGOVIZ_PYTHON ?? "python";
+  const observed = execFileSync(python, ["-B", adapter, directory], { encoding: "utf8" });
+  assert.deepEqual(JSON.parse(observed), { optimalValue: 18, states: rows.length });
+  const generated = pathToFileURL(`${directory}/`);
+  await checkGeneratedInputs(generated, fixture);
+  const validation = execFileSync(process.execPath, [cli, "validate", join(directory, "visualization.json"), join(directory, "trace.jsonl")], { encoding: "utf8" });
+  assert.match(validation, /Validated 4 replay states/);
+
+  const customInput = join(directory, "custom-input.json");
+  const customOutput = join(directory, "custom");
+  await writeFile(customInput, JSON.stringify({ ...input, capacity: 5 }));
+  const customResult = execFileSync(python, ["-B", adapter, customOutput, "--input", customInput], { encoding: "utf8" });
+  assert.deepEqual(JSON.parse(customResult), { optimalValue: 16, states: rows.length });
+  const custom = loadReplay(await readFile(join(customOutput, "trace.jsonl"), "utf8"), {
+    specText: await readFile(join(customOutput, "visualization.json"), "utf8"),
+  });
+  assert.deepEqual(custom.seek(custom.lastStep).state.bestByCapacity.map(({ value }) => value), rows.at(-1).slice(0, 6));
+
+  const file = join(directory, "knapsack.html");
+  buildPreview(generated, file);
+  const browser = await chromium.launch({ channel: process.env.ALGOVIZ_BROWSER_CHANNEL });
+  t.after(() => browser.close());
+  const { page, requests, errors } = await openOfflinePreview(browser, file);
+  await openStatePanel(page);
+  await checkNavigation(page, rows.length, async (index) => {
+    const values = rows[index];
+    assert.equal(await page.locator("#step").textContent(), `Step ${index} of ${rows.length - 1}`);
+    assert.deepEqual(await page.locator(".array code").allTextContents(), values.map(String));
+    const state = JSON.parse(await page.locator("#state-json").textContent());
+    assert.deepEqual(state, {
+      ...input, processedItems: index, bestByCapacity: values.map((value, capacity) => ({ capacity: String(capacity), value })),
+    });
+
+    if (index === 0) {
+      assert.equal(await page.locator("#change-list").textContent(), "Initial state");
+      return;
+    }
+    const expectedChanges = [{ path: "/processedItems", before: String(index - 1), after: String(index) }];
+    for (const [capacity, value] of values.entries()) {
+      const previous = rows[index - 1][capacity];
+      if (previous !== value) {
+        expectedChanges.push({ path: `/bestByCapacity/${capacity}/value`, before: String(previous), after: String(value) });
+      }
+    }
+    const changes = await page.locator("[data-change-path]").evaluateAll((entries) => entries.map((entry) => ({
+      path: entry.dataset.changePath,
+      before: entry.querySelector('[data-change-side="before"]').textContent,
+      after: entry.querySelector('[data-change-side="after"]').textContent,
+    })));
+    assert.deepEqual(changes, expectedChanges);
+  });
+  assert.deepEqual(requests, []);
+  assert.deepEqual(errors, []);
+  await page.close();
 });

@@ -339,7 +339,9 @@ Ensure other human developers can understand and maintain the resulting code wit
 
 The [v0.2.0 milestone](https://github.com/FlowSilver/AlgoViz/milestone/2) covers [graph edge labels](https://github.com/FlowSilver/AlgoViz/issues/12), [labeled Array items](https://github.com/FlowSilver/AlgoViz/issues/13), and the [supported offline Dijkstra example](https://github.com/FlowSilver/AlgoViz/issues/14). The browser checks cover all five weighted frames and the existing BFS previews.
 
-1. Collect feedback on the [weighted Dijkstra workflow](examples/weighted-dijkstra/README.md).
+The [v0.3.0 milestone](https://github.com/FlowSilver/AlgoViz/milestone/3) covers [step inspection](https://github.com/FlowSilver/AlgoViz/issues/17), [TypeScript checks for the replay core](https://github.com/FlowSilver/AlgoViz/issues/18), and the [knapsack example](https://github.com/FlowSilver/AlgoViz/issues/19). The browser tests compare state and changes through forward stepping, backward stepping, and seeking.
+
+1. Collect feedback on the [knapsack](examples/knapsack/README.md) and [weighted Dijkstra](examples/weighted-dijkstra/README.md) inspection workflows.
 2. Extend the [timed Dijkstra trial](benchmarks/dijkstra/README.md) to the planned multi-algorithm comparison and record authoring and iteration cost.
 3. Turn the most important findings into issues with testable acceptance criteria.
 

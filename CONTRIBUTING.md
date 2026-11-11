@@ -1,6 +1,6 @@
 # Contributing to AlgoViz
 
-Start with the [project overview](README.md), [design decisions](DECISIONS.md), and [release plan](OPEN_SOURCE_DEVELOPMENT.md#12-next-steps). The [BFS example](examples/upstream-bfs/README.md) and [Dijkstra example](examples/weighted-dijkstra/README.md) demonstrate the unweighted and weighted workflows.
+Start with the [project overview](README.md), [design decisions](DECISIONS.md), and [release plan](OPEN_SOURCE_DEVELOPMENT.md#12-next-steps). The [BFS](examples/upstream-bfs/README.md), [Dijkstra](examples/weighted-dijkstra/README.md), and [knapsack](examples/knapsack/README.md) examples cover graph search and dynamic programming.
 
 ## Open an issue
 
@@ -31,7 +31,7 @@ npm test
 
 TypeScript checks the replay core's JavaScript and JSDoc contracts without emitting build output. The tests cover the [replay API](docs/protocol.md#replay-api) against the graph-search fixture and exercise invalid records, updates, and bindings. GitHub Actions runs the same commands for pull requests and pushes to `main`.
 
-To regenerate the BFS and Dijkstra runs and verify the offline inspector, install Python 3.10 or later, run `npx playwright install chromium`, and then run `npm run test:browser`. Set `ALGOVIZ_BROWSER_CHANNEL=msedge` or `chrome` to use a locally installed browser. Set `ALGOVIZ_PYTHON` if your Python executable is named differently.
+To regenerate the BFS, Dijkstra, and knapsack runs and verify the offline inspector, install Python 3.10 or later, run `npx playwright install chromium`, and then run `npm run test:browser`. Set `ALGOVIZ_BROWSER_CHANNEL=msedge` or `chrome` to use a locally installed browser. Set `ALGOVIZ_PYTHON` if your Python executable is named differently.
 
 ## Local pre-commit hook
 
