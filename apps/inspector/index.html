@@ -25,6 +25,16 @@
       </div>
       <p id="error" role="alert" hidden></p>
       <div id="views"></div>
+      <section class="inspection" aria-label="Step inspection">
+        <details id="state-panel">
+          <summary>State</summary>
+          <pre id="state-json" tabindex="0"></pre>
+        </details>
+        <details id="changes-panel" open>
+          <summary>Changes</summary>
+          <div id="change-list"></div>
+        </details>
+      </section>
     </main>
     <script type="application/json" id="preview-data">%DATA%</script>
     <script>%SCRIPT%</script>

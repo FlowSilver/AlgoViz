@@ -25,10 +25,11 @@ From the repository root, use Node.js 22 or later:
 
 ```sh
 npm ci
+npm run typecheck
 npm test
 ```
 
-The tests cover the [replay API](docs/protocol.md#replay-api) against the graph-search fixture and exercise invalid records, updates, and bindings. GitHub Actions runs the same commands for pull requests and pushes to `main`.
+TypeScript checks the replay core's JavaScript and JSDoc contracts without emitting build output. The tests cover the [replay API](docs/protocol.md#replay-api) against the graph-search fixture and exercise invalid records, updates, and bindings. GitHub Actions runs the same commands for pull requests and pushes to `main`.
 
 To regenerate the BFS and Dijkstra runs and verify the offline inspector, install Python 3.10 or later, run `npx playwright install chromium`, and then run `npm run test:browser`. Set `ALGOVIZ_BROWSER_CHANNEL=msedge` or `chrome` to use a locally installed browser. Set `ALGOVIZ_PYTHON` if your Python executable is named differently.
 

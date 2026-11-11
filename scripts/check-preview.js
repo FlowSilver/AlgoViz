@@ -22,7 +22,7 @@ async function checkGeneratedInputs(generated, checkedIn) {
   }
 }
 
-async function checkFixture(browser, file, expected) {
+async function checkFixture(browser, file, expected, inspect) {
   const page = await browser.newPage({ viewport: { width: 1000, height: 740 } });
   const requests = [];
   const errors = [];
@@ -32,6 +32,7 @@ async function checkFixture(browser, file, expected) {
     await route.abort();
   });
   await page.goto(pathToFileURL(file).href);
+  if (inspect) await page.locator("#state-panel summary").click();
 
   const previous = page.getByRole("button", { name: "Previous" });
   const next = page.getByRole("button", { name: "Next" });
@@ -61,6 +62,7 @@ async function checkFixture(browser, file, expected) {
     }))), edgeLabels);
     assert.deepEqual(await viewItems("frontier"), target.frontier);
     if (target.distances) assert.deepEqual(await viewItems("tentative-distances"), target.distances);
+    if (inspect) await inspect(page, index);
   }
 
   assert(await previous.isDisabled());
@@ -179,6 +181,8 @@ test("edge labels and labeled Array values follow the current replay frame", asy
   assert.equal(await page.locator('[data-edge-label-for="A-B"]').textContent(), "shortcut");
   assert.equal(await page.locator('[data-edge-label-for="B-B"]').count(), 0);
   assert.deepEqual(await itemValues.allTextContents(), ["0", "2"]);
+  assert.equal(await page.locator('[data-change-path="/graph/edges/1/label"] [data-change-side="after"]').textContent(), "Absent");
+  assert.equal(await page.locator('[data-change-path="/distances/1/distance"] [data-change-side="before"]').textContent(), "null");
   await page.getByRole("slider", { name: "Seek" }).fill("0");
   assert.deepEqual(await labels.allTextContents(), ["0", "loop"]);
   assert.deepEqual(await itemValues.allTextContents(), ["0", "∞"]);
@@ -215,5 +219,15 @@ test("the weighted Dijkstra example uses native views across all five offline fr
   buildPreview(generated, file);
   const browser = await chromium.launch({ channel: process.env.ALGOVIZ_BROWSER_CHANNEL });
   t.after(() => browser.close());
-  await checkFixture(browser, file, expected);
+  await checkFixture(browser, file, expected, async (page, index) => {
+    const target = expected.steps[index];
+    const state = JSON.parse(await page.locator("#state-json").textContent());
+    assert.deepEqual(state.distances, target.distances.map(({ label, value }) => ({ vertex: label, distance: value })));
+    if (index === 0) assert.equal(await page.locator("#change-list").textContent(), "Initial state");
+    if (index === 2) {
+      const change = page.locator('[data-change-path="/distances/1/distance"]');
+      assert.equal(await change.locator('[data-change-side="before"]').textContent(), "5");
+      assert.equal(await change.locator('[data-change-side="after"]').textContent(), "2");
+    }
+  });
 });

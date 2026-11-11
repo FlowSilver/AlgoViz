@@ -46,6 +46,26 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--green); out
 .array-label { color: var(--muted); font-size: .75rem; }
 .empty { margin: 0; padding: 1rem; color: var(--muted); }
 
+.inspection { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 1rem; margin-top: 1rem; }
+.inspection details { min-width: 0; border: 1px solid var(--border); border-radius: .85rem; background: #fff; }
+.inspection summary { padding: .95rem 1rem; font-weight: 650; cursor: pointer; }
+.inspection details[open] summary { border-bottom: 1px solid #e5ebe4; }
+#state-json, #change-list { max-height: 22rem; overflow: auto; margin: 0; }
+#state-json { padding: 1rem; background: #f9fbf8; font: .82rem/1.5 var(--mono); border-radius: 0 0 .85rem .85rem; }
+.changes { margin: 0; padding: 0; list-style: none; }
+.changes li { padding: .75rem 1rem; border-bottom: 1px solid #e5ebe4; }
+.changes li:last-child { border-bottom: 0; }
+.change-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .3rem; }
+.change-heading code { overflow-wrap: anywhere; font: .8rem var(--mono); }
+.change-kind, .change-value-label { color: var(--muted); font-size: .75rem; }
+.change-values { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; margin-top: .55rem; }
+.change-values pre { min-height: 2rem; max-height: 6rem; overflow: auto; margin: .15rem 0 0; padding: .45rem; border-radius: .35rem; background: #f1f5ee; font: .78rem var(--mono); }
+.change-values .change-absent { color: var(--muted); }
+
+@media (max-width: 48rem) {
+  .inspection { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 34rem) {
   .timeline { gap: .7rem; }
   .seek { order: 1; flex-basis: 100%; }

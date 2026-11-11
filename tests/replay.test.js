@@ -200,3 +200,45 @@ test("labeled Array item bindings validate every candidate frame before committi
     name: "ReplayError", source: "visualization.json", message: /\/views\/0\/item\/value/,
   });
 });
+
+test("changes compare consecutive committed states across seek, backward, and failed navigation", () => {
+  const replay = loadReplay(trace({ items: [{ distance: 5 }], nullable: null, "a/~": 0 },
+    step(
+      { op: "replace", path: "/items/0/distance", value: 9 },
+      { op: "replace", path: "/items/0/distance", value: 2 },
+      { op: "remove", path: "/nullable" },
+      { op: "replace", path: "/a~1~0", value: 1 },
+      { op: "add", path: "/new", value: { missing: null } },
+    ),
+    step({ op: "add", path: "/items/-", value: null }),
+    step({ op: "replace", path: "/items/0/distance", value: 7 }, { op: "remove", path: "/missing" })));
+  assert.deepEqual(replay.changes, []);
+  replay.seek(2);
+  const second = [{ kind: "added", path: "/items/1", after: null }];
+  assert.deepEqual(replay.changes, second);
+  assert.throws(() => replay.stepForward(), ReplayError);
+  assert.equal(replay.current.step, 2);
+  assert.deepEqual(replay.changes, second);
+
+  replay.stepBackward();
+  const first = [
+    { kind: "changed", path: "/items/0/distance", before: 5, after: 2 },
+    { kind: "removed", path: "/nullable", before: null },
+    { kind: "changed", path: "/a~1~0", before: 0, after: 1 },
+    { kind: "added", path: "/new", after: { missing: null } },
+  ];
+  assert.deepEqual(replay.changes, first);
+  replay.changes[3].after.missing = "edited outside replay";
+  assert.deepEqual(replay.changes, first);
+  replay.seek(0);
+  assert.deepEqual(replay.changes, []);
+});
+
+test("changes ignore writes that cancel within one step", () => {
+  const replay = loadReplay(trace({ value: 0 }, step(
+    { op: "replace", path: "/value", value: 1 },
+    { op: "replace", path: "/value", value: 0 },
+  )));
+  replay.stepForward();
+  assert.deepEqual(replay.changes, []);
+});
