@@ -46,7 +46,7 @@ function start() {
   function render({ step, state }) {
     const nodes = panels.map(({ view, title }, index) => {
       const data = resolvePointer(state, view.source);
-      return view.type === "graph" ? renderGraph(data, title, index) : renderArray(data);
+      return view.type === "graph" ? renderGraph(data, title, index) : renderArray(data, view.item);
     });
     for (const [index, panel] of panels.entries()) panel.content.replaceChildren(nodes[index]);
     stepLabel.value = `Step ${step} of ${replay.lastStep}`;

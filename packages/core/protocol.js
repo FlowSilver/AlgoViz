@@ -3,7 +3,7 @@ import { visit } from "jsonc-parser";
 import graphSchema from "../../schemas/graph-view-data.schema.json" with { type: "json" };
 import traceSchema from "../../schemas/trace-record.schema.json" with { type: "json" };
 import specSchema from "../../schemas/visualization-spec.schema.json" with { type: "json" };
-import { resolvePointer } from "./json-pointer.js";
+import { resolveArrayItem, resolvePointer } from "./json-pointer.js";
 
 const ajv = new Ajv2020({ ownProperties: true });
 ajv.addSchema(traceSchema, "trace-record");
@@ -109,12 +109,24 @@ function checkGraph(graph) {
   }
 }
 
+function checkArray(array, binding) {
+  if (!Array.isArray(array)) throw new Error("Expected an array");
+  if (!binding) return;
+  for (const [index, entry] of array.entries()) {
+    try {
+      resolveArrayItem(entry, binding);
+    } catch (error) {
+      throw new Error(`Array item ${index}: ${error.message}`);
+    }
+  }
+}
+
 export function checkBindings(state, views, source, line) {
   for (const view of views) {
     try {
       const value = resolvePointer(state, view.source);
       if (view.type === "graph") checkGraph(value);
-      else if (!Array.isArray(value)) throw new Error("Expected an array");
+      else checkArray(value, view.item);
     } catch (error) {
       throw new ReplayError(error.message, { source, line, viewId: view.id, path: view.source });
     }

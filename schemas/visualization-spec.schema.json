@@ -17,15 +17,30 @@
         "properties": {
           "id": { "type": "string", "minLength": 1 },
           "type": { "enum": ["graph", "array"] },
-          "source": {
-            "type": "string",
-            "anyOf": [
-              { "const": "" },
-              { "pattern": "^/(?:[^~]|~[01])*$" }
-            ]
+          "source": { "$ref": "#/$defs/pointer" },
+          "item": {
+            "type": "object",
+            "required": ["label", "value"],
+            "additionalProperties": false,
+            "properties": {
+              "label": { "$ref": "#/$defs/pointer" },
+              "value": { "$ref": "#/$defs/pointer" },
+              "nullLabel": { "type": "string", "minLength": 1 }
+            }
           }
-        }
+        },
+        "if": { "required": ["item"] },
+        "then": { "properties": { "type": { "const": "array" } } }
       }
+    }
+  },
+  "$defs": {
+    "pointer": {
+      "type": "string",
+      "anyOf": [
+        { "const": "" },
+        { "pattern": "^/(?:[^~]|~[01])*$" }
+      ]
     }
   }
 }
