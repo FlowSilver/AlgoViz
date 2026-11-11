@@ -62,6 +62,8 @@ See the [project overview](README.md) for the release goal and the [contributing
 
 **Decision:** State updates in the Trace determine the actual visual state at each step. Optional events such as `array.swap` or `node.visit` can communicate animation intent but cannot contradict the state update.
 
+The [v1 trace format](docs/protocol.md#execution-trace) uses `add`, `remove`, and `replace` operations with JSON Pointer paths. A step commits its updates as a batch after validating view bindings.
+
 **Why:** A renderer can reconstruct correct state even if it does not understand an optional semantic event, and cross-language integration is simpler.
 
 **Trade-off:** Raw patches alone may produce unexpressive animations. Rich transitions require renderer-specific interpretation. Event order, stable IDs, and protocol versions must be defined.
@@ -134,13 +136,12 @@ See the [project overview](README.md) for the release goal and the [contributing
 
 ## Open design questions
 
-1. **Trace format:** Standard JSON Patch, a restricted subset, or a custom patch model? What are the rules for invalid paths, batching, and atomicity?
-2. **Large-scale execution:** When do we snapshot, sample, and chunk traces? How can users seek efficiently across millions of steps?
-3. **State vs. layout:** Where do graph-node coordinates live? Which layouts must reproduce deterministically?
-4. **Plugin contract:** How should version compatibility, lifecycle, capability declarations, and third-party trust be handled?
-5. **Run comparison:** How should steps align across traces—index, semantic milestone, wall-clock time, or comparable state?
-6. **Correctness:** How can we test that instrumentation preserves behavior and that adapters capture the right state?
-7. **Data handling:** What are the redaction and sharing conventions for large or sensitive execution traces?
+1. **Large-scale execution:** When do we snapshot, sample, and chunk traces? How can users seek efficiently across millions of steps?
+2. **State vs. layout:** Where do graph-node coordinates live? Which layouts must reproduce deterministically?
+3. **Plugin contract:** How should version compatibility, lifecycle, capability declarations, and third-party trust be handled?
+4. **Run comparison:** How should steps align across traces—index, semantic milestone, wall-clock time, or comparable state?
+5. **Correctness:** How can we test that instrumentation preserves behavior and that adapters capture the right state?
+6. **Data handling:** What are the redaction and sharing conventions for large or sensitive execution traces?
 
 ## Validation experiment to run early
 

@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "layout": "row",
+  "views": [
+    { "id": "search-graph", "type": "graph", "source": "/graph" },
+    { "id": "frontier", "type": "array", "source": "/frontier" }
+  ]
+}

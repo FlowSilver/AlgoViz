@@ -112,6 +112,8 @@ The release goal is an end-to-end workflow in which a coding agent adapts an exi
 
 Grid and other additional renderers, custom renderer plugins, live streaming, and cross-run comparison are deferred beyond `v0.1.0`.
 
+The [v1 protocol](docs/protocol.md) defines both file formats and links to a graph-search fixture with expected states at each step.
+
 Illustrative command shape (**not implemented**):
 
 ```bash
@@ -134,7 +136,7 @@ The benchmark must be **asking AI to generate a standalone visualization directl
 
 ## Contributing
 
-The first design work is the versioned visualization spec and execution trace for `v0.1.0`. Small graph-search examples with expected states and feedback on the replay contract are welcome.
+Small graph-search examples with expected states and feedback on the [v1 protocol](docs/protocol.md) are welcome.
 
 - [Contributing guide](CONTRIBUTING.md) for opening issues and submitting changes.
 - [Design decisions](DECISIONS.md) and [development plan](OPEN_SOURCE_DEVELOPMENT.md) for the release scope and proposed backlog.
