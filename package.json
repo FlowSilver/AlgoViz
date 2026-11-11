@@ -4,14 +4,23 @@
   "private": true,
   "license": "Apache-2.0",
   "type": "module",
+  "bin": {
+    "algoviz": "packages/cli/index.js"
+  },
   "engines": {
     "node": ">=22"
   },
   "scripts": {
-    "test": "node --test"
+    "algoviz": "node packages/cli/index.js",
+    "test": "node --test",
+    "test:browser": "node --test scripts/check-preview.js"
   },
   "dependencies": {
     "ajv": "^8.20.0",
+    "esbuild": "^0.28.2",
     "jsonc-parser": "^3.3.1"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.0"
   }
 }
