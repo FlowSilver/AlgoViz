@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "layout": "row",
+  "views": [
+    {
+      "id": "best-value-by-capacity",
+      "type": "array",
+      "source": "/bestByCapacity",
+      "item": { "label": "/capacity", "value": "/value" }
+    }
+  ]
+}

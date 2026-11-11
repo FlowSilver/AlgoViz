@@ -1,0 +1,8 @@
+{
+  "capacity": 6,
+  "items": [
+    { "name": "Compass", "weight": 2, "value": 6 },
+    { "name": "Radio", "weight": 3, "value": 10 },
+    { "name": "Water", "weight": 4, "value": 12 }
+  ]
+}

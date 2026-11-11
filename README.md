@@ -3,7 +3,7 @@
 **AI-Native Algorithm Execution Inspector**  
 *A reusable runtime for observing, replaying, debugging, and comparing arbitrary algorithm executions.*
 
-> Status: v0.2.0 supports offline weighted graph search with native edge labels, a priority queue, and tentative distances.
+> Status: v0.3.0 adds State and Changes panels to offline previews, with a knapsack example alongside BFS and weighted Dijkstra.
 
 ## Positioning
 
@@ -116,17 +116,17 @@ The [v1 protocol and replay API](docs/protocol.md) define both file formats and 
 
 ## Try the offline preview
 
-From a checkout with Node.js 22 or later, run the recorded [weighted Dijkstra example](examples/weighted-dijkstra/README.md):
+From a checkout with Node.js 22 or later, open the recorded [knapsack example](examples/knapsack/README.md):
 
 ```sh
 npm ci
-npm run algoviz -- validate examples/weighted-dijkstra/visualization.json examples/weighted-dijkstra/trace.jsonl
-npm run algoviz -- preview examples/weighted-dijkstra/visualization.json examples/weighted-dijkstra/trace.jsonl
+npm run algoviz -- validate examples/knapsack/visualization.json examples/knapsack/trace.jsonl
+npm run algoviz -- preview examples/knapsack/visualization.json examples/knapsack/trace.jsonl
 ```
 
 Open the printed `file://` URL in a browser. The HTML contains the trace, spec, and inspector and runs offline. Pass `--output preview.html` to write a new file at a chosen path.
 
-The [upstream BFS example](examples/upstream-bfs/README.md) shows the original unweighted Graph and Array workflow.
+Expand **State** to inspect recorded values and **Changes** to compare with the preceding recorded step. The [BFS](examples/upstream-bfs/README.md) and [weighted Dijkstra](examples/weighted-dijkstra/README.md) examples show the same inspection workflow with a graph and frontier. For another knapsack capacity or item list, follow the [custom input steps](examples/knapsack/README.md#try-your-own-input).
 
 To adapt your own algorithm, point your coding agent to the [AlgoViz skill](.agents/skills/algoviz/SKILL.md). The skill covers choosing observation points, emitting the two inputs, and checking that recording preserves the algorithm's result.
 
@@ -156,5 +156,5 @@ Small graph-search examples with expected states and feedback on the [v1 protoco
 ## License
 
 AlgoViz is licensed under the [Apache License 2.0](LICENSE).
-The vendored algorithms retain their upstream MIT licenses. [BFS license](examples/upstream-bfs/LICENSE-upstream.md) · [Dijkstra license](benchmarks/dijkstra/LICENSE-upstream.md)
+The vendored algorithms retain their upstream MIT licenses. [BFS license](examples/upstream-bfs/LICENSE-upstream.md) · [Dijkstra license](benchmarks/dijkstra/LICENSE-upstream.md) · [Knapsack license](examples/knapsack/LICENSE-upstream.md)
 
