@@ -30,6 +30,8 @@ npm test
 
 The tests cover the [replay API](docs/protocol.md#replay-api) against the graph-search fixture and exercise invalid records, updates, and bindings. GitHub Actions runs the same commands for pull requests and pushes to `main`.
 
+To verify the offline inspector in Chromium, run `npx playwright install chromium` and then `npm run test:browser`. Set `ALGOVIZ_BROWSER_CHANNEL=msedge` or `chrome` to use a locally installed browser instead.
+
 ## Local pre-commit hook
 
 Run this once from your clone to enable the repository's hook:

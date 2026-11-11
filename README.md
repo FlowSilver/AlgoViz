@@ -3,7 +3,7 @@
 **AI-Native Algorithm Execution Inspector**  
 *A reusable runtime for observing, replaying, debugging, and comparing arbitrary algorithm executions.*
 
-> Status: Pre-release. The replay core can load a v1 trace and navigate its states. The browser inspector and CLI described below are planned.
+> Status: The v0.1.0 preview supports local validation and offline replay with synchronized Graph and Array views.
 
 ## Positioning
 
@@ -114,12 +114,17 @@ Grid and other additional renderers, custom renderer plugins, live streaming, an
 
 The [v1 protocol and replay API](docs/protocol.md) define both file formats and show how to inspect the graph-search fixture.
 
-Illustrative command shape (**not implemented**):
+### Try the offline preview
 
-```bash
-algoviz validate visualization.json trace.jsonl
-algoviz preview visualization.json trace.jsonl
+From a checkout with Node.js 22 or later, install dependencies and run:
+
+```sh
+npm ci
+npm run algoviz -- validate examples/graph-search/visualization.json examples/graph-search/trace.jsonl
+npm run algoviz -- preview examples/graph-search/visualization.json examples/graph-search/trace.jsonl
 ```
+
+Open the printed `file://` URL in a browser. The HTML contains the trace, spec, and inspector and runs offline. Pass `--output preview.html` to write a new file at a chosen path.
 
 ## What success looks like
 

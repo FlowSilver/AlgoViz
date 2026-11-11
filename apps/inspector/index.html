@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AlgoViz</title>
+    <style>%STYLES%</style>
+  </head>
+  <body>
+    <main>
+      <header class="header">
+        <h1>AlgoViz</h1>
+        <span id="source"></span>
+      </header>
+      <div class="timeline" role="group" aria-label="Replay controls">
+        <div class="buttons">
+          <button type="button" id="previous" disabled>Previous</button>
+          <button type="button" id="next" disabled>Next</button>
+        </div>
+        <label class="seek" for="seek">
+          <span>Seek</span>
+          <input id="seek" type="range" min="0" max="0" value="0" disabled>
+        </label>
+        <output id="step" for="seek" aria-live="polite">Loading trace</output>
+      </div>
+      <p id="error" role="alert" hidden></p>
+      <div id="views"></div>
+    </main>
+    <script type="application/json" id="preview-data">%DATA%</script>
+    <script>%SCRIPT%</script>
+    <!--
+%LICENSES%
+    -->
+  </body>
+</html>
