@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AlgoViz Execution Trace Record v1",
+  "oneOf": [
+    { "$ref": "#/$defs/initial" },
+    { "$ref": "#/$defs/step" }
+  ],
+  "$defs": {
+    "initial": {
+      "type": "object",
+      "required": ["type", "version", "state"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "initial" },
+        "version": { "const": 1 },
+        "state": { "type": "object" }
+      }
+    },
+    "step": {
+      "type": "object",
+      "required": ["type", "updates"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "step" },
+        "updates": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/update" }
+        },
+        "events": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/event" }
+        }
+      }
+    },
+    "update": {
+      "type": "object",
+      "required": ["op", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "op": { "enum": ["add", "remove", "replace"] },
+        "path": { "type": "string", "pattern": "^/(?:[^~]|~[01])*$" },
+        "value": true
+      },
+      "if": { "properties": { "op": { "const": "remove" } } },
+      "then": { "not": { "required": ["value"] } },
+      "else": { "required": ["value"] }
+    },
+    "event": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "type": "string", "minLength": 1 },
+        "data": { "type": "object" }
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AlgoViz Visualization Specification v1",
+  "type": "object",
+  "required": ["version", "layout", "views"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": 1 },
+    "layout": { "enum": ["row", "column"] },
+    "views": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "source"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "type": { "enum": ["graph", "array"] },
+          "source": {
+            "type": "string",
+            "anyOf": [
+              { "const": "" },
+              { "pattern": "^/(?:[^~]|~[01])*$" }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

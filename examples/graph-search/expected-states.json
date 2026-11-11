@@ -1,0 +1,35 @@
+{
+  "edges": [
+    { "id": "A-B", "source": "A", "target": "B" },
+    { "id": "A-C", "source": "A", "target": "C" },
+    { "id": "B-D", "source": "B", "target": "D" },
+    { "id": "C-D", "source": "C", "target": "D" }
+  ],
+  "steps": [
+    {
+      "step": 0,
+      "nodeStatus": { "A": "queued", "B": "unseen", "C": "unseen", "D": "unseen" },
+      "frontier": ["A"]
+    },
+    {
+      "step": 1,
+      "nodeStatus": { "A": "visited", "B": "queued", "C": "queued", "D": "unseen" },
+      "frontier": ["B", "C"]
+    },
+    {
+      "step": 2,
+      "nodeStatus": { "A": "visited", "B": "visited", "C": "queued", "D": "queued" },
+      "frontier": ["C", "D"]
+    },
+    {
+      "step": 3,
+      "nodeStatus": { "A": "visited", "B": "visited", "C": "visited", "D": "queued" },
+      "frontier": ["D"]
+    },
+    {
+      "step": 4,
+      "nodeStatus": { "A": "visited", "B": "visited", "C": "visited", "D": "visited" },
+      "frontier": []
+    }
+  ]
+}
