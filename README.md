@@ -116,19 +116,23 @@ The [v1 protocol and replay API](docs/protocol.md) define both file formats and 
 
 ### Try the offline preview
 
-From a checkout with Node.js 22 or later, install dependencies and run:
+From a checkout with Node.js 22 or later, run the recorded [upstream BFS example](examples/upstream-bfs/README.md):
 
 ```sh
 npm ci
-npm run algoviz -- validate examples/graph-search/visualization.json examples/graph-search/trace.jsonl
-npm run algoviz -- preview examples/graph-search/visualization.json examples/graph-search/trace.jsonl
+npm run algoviz -- validate examples/upstream-bfs/visualization.json examples/upstream-bfs/trace.jsonl
+npm run algoviz -- preview examples/upstream-bfs/visualization.json examples/upstream-bfs/trace.jsonl
 ```
 
 Open the printed `file://` URL in a browser. The HTML contains the trace, spec, and inspector and runs offline. Pass `--output preview.html` to write a new file at a chosen path.
 
+To adapt your own algorithm, point your coding agent to the [AlgoViz skill](.agents/skills/algoviz/SKILL.md). The skill covers choosing observation points, emitting the two inputs, and checking that recording preserves the algorithm's result.
+
 ## What success looks like
 
 The benchmark must be **asking AI to generate a standalone visualization directly**, not merely writing a frontend by hand. Measure time to first correct result, human interventions, correctness of displayed state, cost of adding views, value for comparing repeated runs, and performance on large traces.
+
+The [BFS viewer pilot](benchmarks/README.md) compares the standalone and AlgoViz viewers on the release example.
 
 **Key question: for complex algorithms and iterative investigation, does AlgoViz actually make visualization easier and more reliable than AI-generated standalone code?**
 
@@ -150,4 +154,5 @@ Small graph-search examples with expected states and feedback on the [v1 protoco
 ## License
 
 AlgoViz is licensed under the [Apache License 2.0](LICENSE).
+The vendored BFS source retains its [upstream MIT license](examples/upstream-bfs/LICENSE-upstream.md).
 

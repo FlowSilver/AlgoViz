@@ -145,6 +145,8 @@ The [v1 trace format](docs/protocol.md#execution-trace) uses `add`, `remove`, an
 
 ## Validation experiment to run early
 
+The [BFS viewer pilot](benchmarks/README.md) holds observation data fixed and compares a standalone viewer with AlgoViz on one run.
+
 Choose five real algorithms spanning different types and levels of complexity. For each, ask the **same coding agent** to complete two tasks:
 
 - **Baseline A:** “Generate an interactive standalone webpage visualizing this algorithm.”

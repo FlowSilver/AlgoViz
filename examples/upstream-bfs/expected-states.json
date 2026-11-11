@@ -1,0 +1,44 @@
+{
+  "edges": [
+    { "id": "0:0", "source": "0", "target": "1" },
+    { "id": "0:1", "source": "0", "target": "2" },
+    { "id": "1:0", "source": "1", "target": "3" },
+    { "id": "2:0", "source": "2", "target": "3" },
+    { "id": "2:1", "source": "2", "target": "4" },
+    { "id": "3:0", "source": "3", "target": "1" },
+    { "id": "4:0", "source": "4", "target": "4" },
+    { "id": "5:0", "source": "5", "target": "5" }
+  ],
+  "steps": [
+    {
+      "step": 0,
+      "nodeStatus": { "0": "queued", "1": "unseen", "2": "unseen", "3": "unseen", "4": "unseen", "5": "unseen" },
+      "frontier": ["0"]
+    },
+    {
+      "step": 1,
+      "nodeStatus": { "0": "visited", "1": "queued", "2": "queued", "3": "unseen", "4": "unseen", "5": "unseen" },
+      "frontier": ["1", "2"]
+    },
+    {
+      "step": 2,
+      "nodeStatus": { "0": "visited", "1": "visited", "2": "queued", "3": "queued", "4": "unseen", "5": "unseen" },
+      "frontier": ["2", "3"]
+    },
+    {
+      "step": 3,
+      "nodeStatus": { "0": "visited", "1": "visited", "2": "visited", "3": "queued", "4": "queued", "5": "unseen" },
+      "frontier": ["3", "4"]
+    },
+    {
+      "step": 4,
+      "nodeStatus": { "0": "visited", "1": "visited", "2": "visited", "3": "visited", "4": "queued", "5": "unseen" },
+      "frontier": ["4"]
+    },
+    {
+      "step": 5,
+      "nodeStatus": { "0": "visited", "1": "visited", "2": "visited", "3": "visited", "4": "visited", "5": "unseen" },
+      "frontier": []
+    }
+  ]
+}
