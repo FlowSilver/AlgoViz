@@ -1,0 +1,77 @@
+{
+  "timeBasis": "UTC wall clock. Submission sampled immediately before dispatch. Endpoint is the first passing checker completion.",
+  "trials": {
+    "standalone": {
+      "initial": {
+        "submittedAt": "2026-11-11T12:27:17.661Z",
+        "firstPassAt": "2026-11-11T12:29:54.207Z",
+        "elapsedSeconds": 156.546,
+        "humanInterventions": 0,
+        "generatedHtmlBytes": 9302,
+        "checks": [
+          {
+            "started": "2026-11-11T12:29:32.335Z",
+            "finished": "2026-11-11T12:29:43.578Z",
+            "passed": false,
+            "failure": "browserType.launch: Target page, context or browser has been closed"
+          },
+          {
+            "started": "2026-11-11T12:29:52.654Z",
+            "finished": "2026-11-11T12:29:54.207Z",
+            "passed": true
+          }
+        ]
+      },
+      "follow-up": {
+        "submittedAt": "2026-11-11T12:30:20.824Z",
+        "firstPassAt": "2026-11-11T12:31:04.158Z",
+        "elapsedSeconds": 43.334,
+        "humanInterventions": 0,
+        "generatedHtmlBytes": 9982,
+        "checks": [
+          {
+            "started": "2026-11-11T12:31:02.492Z",
+            "finished": "2026-11-11T12:31:04.158Z",
+            "passed": true
+          }
+        ]
+      }
+    },
+    "algoviz": {
+      "initial": {
+        "submittedAt": "2026-11-11T12:27:35.214Z",
+        "firstPassAt": "2026-11-11T12:29:48.895Z",
+        "elapsedSeconds": 133.681,
+        "humanInterventions": 0,
+        "generatedHtmlBytes": 179429,
+        "checks": [
+          {
+            "started": "2026-11-11T12:29:23.301Z",
+            "finished": "2026-11-11T12:29:36.043Z",
+            "passed": false,
+            "failure": "browserType.launch: Target page, context or browser has been closed"
+          },
+          {
+            "started": "2026-11-11T12:29:46.258Z",
+            "finished": "2026-11-11T12:29:48.895Z",
+            "passed": true
+          }
+        ]
+      },
+      "follow-up": {
+        "submittedAt": "2026-11-11T12:30:28.235Z",
+        "firstPassAt": "2026-11-11T12:31:22.191Z",
+        "elapsedSeconds": 53.956,
+        "humanInterventions": 0,
+        "generatedHtmlBytes": 180273,
+        "checks": [
+          {
+            "started": "2026-11-11T12:31:20.059Z",
+            "finished": "2026-11-11T12:31:22.191Z",
+            "passed": true
+          }
+        ]
+      }
+    }
+  }
+}

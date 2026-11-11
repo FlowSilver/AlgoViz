@@ -147,6 +147,8 @@ The [v1 trace format](docs/protocol.md#execution-trace) uses `add`, `remove`, an
 
 The [BFS viewer pilot](benchmarks/README.md) holds observation data fixed and compares a standalone viewer with AlgoViz on one run.
 
+The [timed Dijkstra trial](benchmarks/dijkstra/README.md) records an initial build and a follow-up change in two fresh sessions. It is one pair in the planned comparison.
+
 Choose five real algorithms spanning different types and levels of complexity. For each, ask the **same coding agent** to complete two tasks:
 
 - **Baseline A:** “Generate an interactive standalone webpage visualizing this algorithm.”

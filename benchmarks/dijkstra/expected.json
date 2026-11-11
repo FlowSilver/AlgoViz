@@ -1,0 +1,30 @@
+{
+  "result": { "S": 0, "A": 2, "B": 1, "C": 4, "U": null },
+  "frames": [
+    {
+      "status": { "S": "queued", "A": "unseen", "B": "unseen", "C": "unseen", "U": "unseen" },
+      "frontier": ["S: 0"],
+      "distances": ["S: 0", "A: ∞", "B: ∞", "C: ∞", "U: ∞"]
+    },
+    {
+      "status": { "S": "settled", "A": "queued", "B": "queued", "C": "unseen", "U": "unseen" },
+      "frontier": ["B: 1", "A: 5"],
+      "distances": ["S: 0", "A: 5", "B: 1", "C: ∞", "U: ∞"]
+    },
+    {
+      "status": { "S": "settled", "A": "queued", "B": "settled", "C": "queued", "U": "unseen" },
+      "frontier": ["A: 2", "C: 11"],
+      "distances": ["S: 0", "A: 2", "B: 1", "C: 11", "U: ∞"]
+    },
+    {
+      "status": { "S": "settled", "A": "settled", "B": "settled", "C": "queued", "U": "unseen" },
+      "frontier": ["C: 4"],
+      "distances": ["S: 0", "A: 2", "B: 1", "C: 4", "U: ∞"]
+    },
+    {
+      "status": { "S": "settled", "A": "settled", "B": "settled", "C": "settled", "U": "unseen" },
+      "frontier": [],
+      "distances": ["S: 0", "A: 2", "B: 1", "C: 4", "U: ∞"]
+    }
+  ]
+}
