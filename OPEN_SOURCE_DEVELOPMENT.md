@@ -178,17 +178,14 @@ Configure default-branch protection or rulesets, subject to repository permissio
 
 The release is complete when a coding agent can adapt an existing graph-search algorithm with no prior AlgoViz integration and replay one local run in an offline browser preview. The search graph and ordered frontier queue must stay in sync during forward and backward stepping and when seeking to any recorded step.
 
-The numbers below are proposed identifiers, **not existing GitHub Issue numbers**.
-
-| Proposed Issue | Type | Work Item | Primary Acceptance Outcome |
+| Tracking | Type | Work Item | Primary Acceptance Outcome |
 | --- | --- | --- | --- |
-| #1 | Spike / Research | Validate AI-first visualization workflow | Compare success rate, completion time, and iteration cost of AI-from-scratch vs. AI-with-AlgoViz |
-| #2 | Core | Define the minimal Spec and Trace formats | Specify a versioned JSON spec for view selection, bindings to trace state, and basic layout, plus a versioned JSONL trace with initial state, ordered updates, and optional events. Provide schemas for both. |
-| #3 | Core | Implement deterministic trace replay | Reconstruct one run and support forward and backward stepping and seeking to any recorded step. |
-| #4 | Renderer | Implement Graph and Array renderers | Show a search graph and its ordered frontier queue at the same execution step. |
-| #5 | Tooling | Build `validate` and `preview` commands | Validate the spec and trace from local files and launch an offline browser preview. |
-| #6 | AI Integration | Create AI integration skill | Enable a coding agent to discover the interfaces and generate an adapter and visualization spec. |
-| #7 | Testing | End-to-end integration test | Adapt an existing graph-search algorithm with no prior AlgoViz integration. Check that the adapted algorithm returns the same result as the original on the demo inputs and that both views match the recorded execution at known steps. |
+| [BFS pilot](benchmarks/README.md) | Research | Compare the offline viewer workflows on the release example | Compare state fidelity, viewer-specific code, output size, and a follow-up view. |
+| [#1](https://github.com/FlowSilver/AlgoViz/issues/1) | Core | Define the minimal Spec and Trace formats | Specify a versioned JSON spec for view selection, bindings to trace state, and basic layout, plus a versioned JSONL trace with initial state, ordered updates, and optional events. Provide schemas for both. |
+| [#3](https://github.com/FlowSilver/AlgoViz/issues/3) | Core | Implement deterministic trace replay | Reconstruct one run and support forward and backward stepping and seeking to any recorded step. |
+| [#5](https://github.com/FlowSilver/AlgoViz/issues/5) | Renderer | Implement Graph and Array renderers | Show a search graph and its ordered frontier queue at the same execution step. |
+| [#6](https://github.com/FlowSilver/AlgoViz/issues/6) | Tooling | Build `validate` and `preview` commands | Validate the spec and trace from local files and generate an offline browser preview. |
+| [#7](https://github.com/FlowSilver/AlgoViz/issues/7) | AI Integration and Testing | Ship the skill and verify an end-to-end adaptation | Enable agents to produce an adapter and spec. Compare the recorded algorithm's result with the original, then verify graph and frontier states in the browser. |
 
 ### 6.1 Out of Scope for v0.1.0
 
@@ -340,10 +337,9 @@ Ensure other human developers can understand and maintain the resulting code wit
 
 ## 12. Next Steps
 
-1. Build the Graph and Array views for the [`v0.1.0` milestone](https://github.com/FlowSilver/AlgoViz/milestone/1) using the [replay API and graph-search fixture](docs/protocol.md).
-2. Turn the remaining backlog items into issues as their acceptance criteria become clear. Add a GitHub Project board when several issues need coordination.
-3. Validate the end-to-end workflow against the fixture and compare it with a standalone visualization.
-4. Publish the first usable demonstration and update requirements and design decisions based on the results.
+1. Collect feedback on the [`v0.1.0` release](https://github.com/FlowSilver/AlgoViz/releases/tag/v0.1.0) and [upstream BFS example](examples/upstream-bfs/README.md).
+2. Extend the [BFS viewer pilot](benchmarks/README.md) to the planned multi-algorithm comparison and record authoring and iteration cost.
+3. Turn the most important findings into issues with testable acceptance criteria.
 
 ---
 

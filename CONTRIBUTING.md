@@ -30,7 +30,7 @@ npm test
 
 The tests cover the [replay API](docs/protocol.md#replay-api) against the graph-search fixture and exercise invalid records, updates, and bindings. GitHub Actions runs the same commands for pull requests and pushes to `main`.
 
-To verify the offline inspector in Chromium, run `npx playwright install chromium` and then `npm run test:browser`. Set `ALGOVIZ_BROWSER_CHANNEL=msedge` or `chrome` to use a locally installed browser instead.
+To verify the offline inspector and the upstream BFS example, install Python 3.10 or later, run `npx playwright install chromium`, and then run `npm run test:browser`. Set `ALGOVIZ_BROWSER_CHANNEL=msedge` or `chrome` to use a locally installed browser. Set `ALGOVIZ_PYTHON` if your Python executable is named differently.
 
 ## Local pre-commit hook
 

@@ -9,22 +9,13 @@ import { chromium } from "playwright";
 
 const cli = fileURLToPath(new URL("../packages/cli/index.js", import.meta.url));
 
-export function buildPreview(fixture, output) {
+function buildPreview(fixture, output) {
   execFileSync(process.execPath, [cli, "preview",
     fileURLToPath(new URL("visualization.json", fixture)), fileURLToPath(new URL("trace.jsonl", fixture)),
     "--output", output]);
 }
 
-test("the offline browser preview keeps graph and frontier synchronized", async (t) => {
-  const fixture = new URL("../examples/graph-search/", import.meta.url);
-  const expected = JSON.parse(await readFile(new URL("expected-states.json", fixture), "utf8"));
-  const directory = await mkdtemp(join(tmpdir(), "algoviz-browser-"));
-  t.after(() => rm(directory, { recursive: true, force: true }));
-  const file = join(directory, "preview.html");
-  buildPreview(fixture, file);
-
-  const browser = await chromium.launch({ channel: process.env.ALGOVIZ_BROWSER_CHANNEL });
-  t.after(() => browser.close());
+async function checkFixture(browser, file, expected) {
   const page = await browser.newPage({ viewport: { width: 1000, height: 740 } });
   const requests = [];
   const errors = [];
@@ -60,7 +51,7 @@ test("the offline browser preview keeps graph and frontier synchronized", async 
   }
   assert(await next.isDisabled());
   await previous.click();
-  await checkStep(3);
+  await checkStep(expected.steps.length - 2);
   await seek.fill("1");
   await checkStep(1);
   await seek.press("Home");
@@ -71,6 +62,18 @@ test("the offline browser preview keeps graph and frontier synchronized", async 
   assert.deepEqual(requests, []);
   assert.deepEqual(errors, []);
   await page.close();
+}
+
+test("the offline browser preview keeps graph and frontier synchronized", async (t) => {
+  const fixture = new URL("../examples/graph-search/", import.meta.url);
+  const expected = JSON.parse(await readFile(new URL("expected-states.json", fixture), "utf8"));
+  const directory = await mkdtemp(join(tmpdir(), "algoviz-browser-"));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const file = join(directory, "preview.html");
+  buildPreview(fixture, file);
+  const browser = await chromium.launch({ channel: process.env.ALGOVIZ_BROWSER_CHANNEL });
+  t.after(() => browser.close());
+  await checkFixture(browser, file, expected);
 
   const literal = '</script><p id="injected-content">literal</p>';
   await writeFile(join(directory, "visualization.json"), JSON.stringify({
@@ -84,4 +87,29 @@ test("the offline browser preview keeps graph and frontier synchronized", async 
   assert.equal(await textPage.locator(".array code").textContent(), literal);
   assert.equal(await textPage.locator("#injected-content").count(), 0);
   await textPage.close();
+});
+
+test("the upstream BFS adapter preserves the result and its generated run replays offline", async (t) => {
+  const fixture = new URL("../examples/upstream-bfs/", import.meta.url);
+  const directory = await mkdtemp(join(tmpdir(), "algoviz-upstream-bfs-"));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const adapter = fileURLToPath(new URL("adapter.py", fixture));
+  for (const [start, visited] of [[0, [0, 1, 2, 3, 4]], [2, [1, 2, 3, 4]], [5, [5]]]) {
+    const output = join(directory, String(start));
+    const result = execFileSync(process.env.ALGOVIZ_PYTHON ?? "python", ["-B", adapter, output, "--start", String(start)], { encoding: "utf8" });
+    assert.deepEqual(JSON.parse(result), { start, visited, states: visited.length + 1 });
+    execFileSync(process.execPath, [cli, "validate", join(output, "visualization.json"), join(output, "trace.jsonl")]);
+  }
+
+  const generated = pathToFileURL(`${join(directory, "0")}/`);
+  for (const name of ["visualization.json", "trace.jsonl"]) {
+    const checkedIn = (await readFile(new URL(name, fixture), "utf8")).replaceAll("\r\n", "\n");
+    assert.equal(await readFile(new URL(name, generated), "utf8"), checkedIn);
+  }
+  const file = join(directory, "upstream-bfs.html");
+  buildPreview(generated, file);
+  const expected = JSON.parse(await readFile(new URL("expected-states.json", fixture), "utf8"));
+  const browser = await chromium.launch({ channel: process.env.ALGOVIZ_BROWSER_CHANNEL });
+  t.after(() => browser.close());
+  await checkFixture(browser, file, expected);
 });
