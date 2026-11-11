@@ -1,6 +1,6 @@
 # Security Policy
 
-AlgoViz is in pre-release design. For reports about work in this repository, identify the affected commit or branch.
+Include the affected AlgoViz release tag or commit. For a generated offline preview, include the AlgoViz version used to build it.
 
 ## Report a vulnerability
 

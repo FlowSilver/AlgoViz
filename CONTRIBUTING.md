@@ -17,6 +17,8 @@ Search [existing issues](https://github.com/FlowSilver/AlgoViz/issues) before op
 3. Describe how you verified the change. For documentation, check the links and examples you touched. When changing the protocol, update the affected schema, examples, and tests together as those artifacts become available.
 4. Open the pull request against `main`. If the change relies on an open design decision, explain the assumption and its impact in the description.
 
+Update the affected quickstart or example in the same PR as a user-visible change. See the [release cadence](OPEN_SOURCE_DEVELOPMENT.md#release-cadence) for when to tag a release.
+
 Participation follows the [code of conduct](CODE_OF_CONDUCT.md). Contributions are made under the project's [Apache-2.0 license](LICENSE).
 
 ## Run the tests

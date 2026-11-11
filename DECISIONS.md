@@ -1,8 +1,6 @@
 # AlgoViz: Key Design Decisions and Trade-offs
 
-> **Document type: Working design decisions.** These are the current recommended directions emerging from discussion, **not a claim that features exist or that every choice is final**. They should be revisited through prototypes and user testing.
->
-> Status legend: **Tentative** = current preferred direction; **To validate** = key assumption without empirical evidence; **Open** = still needs a decision.
+**Adopted** decisions describe the current release. **To validate** marks a hypothesis that needs more evidence.
 
 See the [project overview](README.md) for the release goal and the [contributing guide](CONTRIBUTING.md) for proposing a change to a decision.
 
@@ -10,23 +8,23 @@ See the [project overview](README.md) for the release goal and the [contributing
 
 | ID | Topic | Current direction | Status |
 | --- | --- | --- | --- |
-| D01 | Product positioning | Algorithm Execution Inspector, not a one-off animation generator | Tentative |
-| D02 | Role of AI | Use external AI coding agents; do not bundle an LLM | Tentative |
-| D03 | Core model | State + View + Transition; separate Spec and Trace inputs | Tentative |
-| D04 | API vs. DSL | Bounded declarative DSL + generic state updates + optional semantic events | Tentative |
-| D05 | State authority | State patches are the source of truth; semantic events enhance presentation | Tentative |
-| D06 | Adaptation | Prefer external adapters; add minimal instrumentation when necessary | Tentative |
-| D07 | Language support | Protocol first; JSONL files before SDKs and live streaming | Tentative |
-| D08 | Renderers | Graph and Array in v0.1.0, with custom renderers deferred | Tentative |
-| D09 | Execution environment | Local first; no untrusted cloud code execution in MVP | Tentative |
-| D10 | Agent interface | CLI + schemas + Skill before evaluating MCP | Tentative |
+| D01 | Product positioning | Offline inspection of recorded algorithm runs | Adopted |
+| D02 | Role of AI | Use external coding agents to adapt existing algorithms | Adopted |
+| D03 | Core model | State, View, and Transition with separate Spec and Trace inputs | Adopted |
+| D04 | API vs. DSL | Bounded declarative spec, generic updates, and optional semantic events | Adopted |
+| D05 | State authority | State patches determine each frame. Semantic events can inform presentation. | Adopted |
+| D06 | Adaptation | Prefer external adapters and add minimal instrumentation when necessary | Adopted |
+| D07 | Language support | Versioned JSON spec and JSONL trace files | Adopted |
+| D08 | Renderers | Graph and Array, with optional edge labels and labeled Array items | Adopted |
+| D09 | Execution environment | Run the algorithm locally and inspect the resulting trace offline | Adopted |
+| D10 | Agent interface | CLI, machine-readable schemas, and an AlgoViz skill | Adopted |
 | D11 | Product value | Benchmark against AI-generated standalone web apps | To validate |
 
 ## Rationale and trade-offs
 
 ### D01 — Shift from an animation framework to an execution inspector
 
-**Decision:** Center the product on observing, replaying, debugging, and comparing execution traces—not merely generating an animation.
+**Decision:** Center the product on replaying and inspecting recorded execution traces. Comparison across separate runs is an open design question.
 
 **Why:** AI can already generate simple animations. Persistent traces, run comparison, timeline controls, and state inspection benefit more from a shared, tested runtime.
 
@@ -50,13 +48,13 @@ See the [project overview](README.md) for the release goal and the [contributing
 
 ### D04 — Use a bounded DSL, not a second frontend programming language
 
-**Decision:** The Spec primarily describes data sources, components, visual encodings, and layout. Special visual behavior can be implemented through custom renderer plugins.
+**Decision:** The Spec describes data sources, built-in views, bindings, and layout. Custom renderer registration is a future design candidate.
 
 **Rejected extremes:** a purely fixed algorithm-event API; or an unrestricted DSL with loops, functions, and arbitrary scripting.
 
 **Why:** The former is too rigid for novel algorithms; the latter becomes a new, hard-to-maintain UI framework. AI can already write code when custom logic is genuinely needed.
 
-**Trade-off:** Unusual visualizations still require a plugin, and the boundary of the declarative layer must be explicit.
+**Trade-off:** Graph and Array cover the current examples. Future visualizations may need additional built-in views or a plugin contract.
 
 ### D05 — Generic state updates are authoritative; semantic events are optional
 
@@ -78,7 +76,7 @@ The [v1 trace format](docs/protocol.md#execution-trace) uses `add`, `remove`, an
 
 ### D07 — Start cross-language support with a common protocol, not many SDKs
 
-**Decision:** Define a versioned, language-independent serialized format. **JSONL trace import** is the MVP route; language-specific SDKs are convenience wrappers, and live transport can follow.
+**Decision:** The versioned, language-independent protocol uses JSONL trace files. Language-specific SDKs and live transport are possible extensions.
 
 **Why:** Multiple languages need only emit compatible records rather than requiring a complex library per language from day one.
 
@@ -86,7 +84,7 @@ The [v1 trace format](docs/protocol.md#execution-trace) uses `add`, `remove`, an
 
 ### D08 — Provide useful built-ins while retaining a plugin escape hatch
 
-**Decision:** Ship Graph and Array in `v0.1.0` and use them to show a search graph and its frontier queue at the same execution step. Evaluate Grid and custom renderer registration in later releases.
+**Decision:** Graph and Array shipped in `v0.1.0`. `v0.2.0` added optional graph edge labels and labeled Array items, and `v0.3.0` added State and Changes panels. Grid and custom renderer registration are design candidates.
 
 **Why:** These two renderers exercise synchronization between different views and cover the first integration without requiring a renderer for each algorithm.
 
@@ -102,7 +100,7 @@ The [v1 trace format](docs/protocol.md#execution-trace) uses `add`, `remove`, an
 
 ### D10 — Start agent integration with CLI, schemas, and a Skill
 
-**Decision:** Offer discoverable renderer documentation, strict schemas, actionable error messages, and commands such as `validate` and `preview`. First prove that coding agents can integrate against these interfaces.
+**Decision:** The agent workflow uses the AlgoViz skill, strict schemas, and the `validate` and `preview` commands. The examples show how to adapt existing implementations and verify their results.
 
 **Why:** Modern agents already read repositories, edit files, and execute commands; MCP should not be a prerequisite for the MVP.
 
@@ -112,11 +110,11 @@ The [v1 trace format](docs/protocol.md#execution-trace) uses `add`, `remove`, an
 
 **Decision:** Evaluate the framework against the realistic alternative: the same AI agent generating an independent interactive visualization from scratch.
 
-**Key hypothesis (unvalidated):** For complex, repeatedly examined algorithms, AlgoViz reduces implementation and iteration cost while improving reproducibility and reliability.
+**Key hypothesis:** For complex, repeatedly examined algorithms, AlgoViz reduces implementation and iteration cost while improving reproducibility and reliability. The BFS pilot and one timed Dijkstra pair provide preliminary results.
 
 **Risk:** If standalone AI-generated visualization remains faster, more accurate, and similarly maintainable, the product direction should change rather than simply expanding the framework.
 
-## Proposed v0.1.0 scope
+## v0.1.0 release scope
 
 **In scope:**
 

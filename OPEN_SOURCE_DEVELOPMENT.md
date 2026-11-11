@@ -1,13 +1,11 @@
 # AlgoViz — Open-Source Strategy and Development Workflow
 
 > **Project Positioning:** AI-Native Algorithm Execution Inspector  
-> **Mission:** A reusable runtime for observing, replaying, debugging, and comparing arbitrary algorithm executions.  
-> **Document Status:** Proposed  
-> **Last Updated:** 2026-11-11
+> **Mission:** A reusable runtime for replaying and inspecting recorded algorithm executions.
 
 ## 1. Executive Summary
 
-AlgoViz is a public Apache-2.0 project. The [contributing guide](CONTRIBUTING.md) describes the current workflow. This document records the proposed development process and `v0.1.0` backlog.
+AlgoViz is a public Apache-2.0 project. This document describes the development workflow, release history, and open research questions. The [contributing guide](CONTRIBUTING.md) covers setup and verification commands.
 
 Recommended workflow:
 
@@ -22,7 +20,7 @@ Feature Branch → Implementation → Tests
           ↓
 Pull Request → CI → Review → Merge
           ↓
-Working Increment → MVP Release → Feedback
+Working Increment → Release → Feedback
                               ↺
 ```
 
@@ -176,7 +174,7 @@ Configure default-branch protection or rulesets, subject to repository permissio
 
 ## 6. MVP v0.1.0: Initial Backlog
 
-The release is complete when a coding agent can adapt an existing graph-search algorithm with no prior AlgoViz integration and replay one local run in an offline browser preview. The search graph and ordered frontier queue must stay in sync during forward and backward stepping and when seeking to any recorded step.
+The [first release](https://github.com/FlowSilver/AlgoViz/releases/tag/v0.1.0) demonstrated a coding agent adapting an existing graph-search algorithm and replaying one local run in an offline browser preview. Its tests checked that the search graph and ordered frontier queue stayed in sync through forward stepping, backward stepping, and seeking.
 
 | Tracking | Type | Work Item | Primary Acceptance Outcome |
 | --- | --- | --- | --- |
@@ -216,40 +214,32 @@ Measure:
 
 ---
 
-## 7. Proposed GitHub Repository Structure
+## 7. Repository structure
 
-Start with a monorepo to reduce coordination and versioning overhead across modules.
+The CLI, replay core, renderers, and browser inspector share one repository.
 
 ```text
 algoviz/
-├── README.md
-├── LICENSE
-├── CONTRIBUTING.md
-├── CODE_OF_CONDUCT.md
-├── SECURITY.md
-├── .github/
-│   ├── ISSUE_TEMPLATE/
-│   ├── pull_request_template.md
-│   └── workflows/
-│       └── ci.yml
+├── .agents/skills/algoviz/
+├── .github/workflows/ci.yml
+├── apps/inspector/
+├── benchmarks/
 ├── docs/
-│   ├── architecture.md
-│   ├── requirements.md
-│   ├── decisions.md
-│   └── adr/
+│   └── protocol.md
+├── examples/
+│   ├── upstream-bfs/
+│   ├── weighted-dijkstra/
+│   └── knapsack/
 ├── packages/
 │   ├── core/
-│   ├── protocol/
 │   ├── renderers/
 │   └── cli/
-├── apps/
-│   └── inspector/
-├── examples/
-│   └── graph-search/
+├── schemas/
+├── scripts/check-preview.js
 └── tests/
 ```
 
-The root community files and GitHub templates are in place. Add source, examples, tests, and CI directories as the corresponding modules become runnable.
+CI type-checks the replay core and runs the unit, CLI, and offline browser tests.
 
 ### 7.1 GitHub Projects
 
@@ -308,24 +298,29 @@ Ensure other human developers can understand and maintain the resulting code wit
 1. Link changes beyond trivial spelling fixes to an Issue whenever practical.
 2. Define testable Acceptance Criteria before implementing a new feature.
 3. Keep each PR focused on one main logical change; avoid unrelated large-scale refactors.
-4. Whenever the core protocol changes, update its schema, tests, examples, and documentation together.
+4. Update the affected docs and examples in the same PR as user-visible changes. When the protocol changes, update the schemas and tests there too.
 5. Keep the default branch buildable and runnable; do not merge when CI fails.
 6. Validate both visualization correctness and whether instrumentation has changed the original algorithm's behavior.
 7. Evaluate maintenance cost, license compatibility, and alternatives before adding dependencies.
 8. Write ADRs for major design decisions rather than leaving the rationale only in chats, Issue comments, or PRs.
-9. Release a usable end-to-end version early instead of waiting for every planned feature.
+9. Release a usable end-to-end increment after verifying it on `main`.
 10. At each Milestone, review whether the project is moving closer to demonstrating that **AI + AlgoViz outperforms AI-generated visualization from scratch**.
 
 ---
 
 ## 11. Current Recommendations and Open Questions
 
-### Recommended for Adoption
+### Current workflow
 
 - **Workflow:** Lightweight SDLC + GitHub Issues + PRs + CI.
 - **Review:** Self-review plus AI assistance during solo development; no mandatory second reviewer.
-- **Code organization:** Start with a monorepo.
-- **Release strategy:** Deliver `v0.1.0` early and iterate based on real-world feedback.
+- **Code organization:** The runtime, CLI, and examples share one repository and release version.
+
+### Release cadence
+
+Tag a minor release when a coherent feature or workflow is ready for users to try. Batch related improvements when they make a better demo together. Publish a patch when a fix needs to reach users of a versioned release, such as a CLI bug or a broken download.
+
+Merge documentation fixes as they are ready. Before tagging a release, run the affected quickstart and check that the README, example guides, and release notes describe the feature being shipped. Verify a bundled demo by opening the generated file in a browser. [Published releases](https://github.com/FlowSilver/AlgoViz/releases)
 
 ### Still to Be Validated
 
@@ -337,9 +332,9 @@ Ensure other human developers can understand and maintain the resulting code wit
 
 ## 12. Next Steps
 
-The [v0.2.0 milestone](https://github.com/FlowSilver/AlgoViz/milestone/2) covers [graph edge labels](https://github.com/FlowSilver/AlgoViz/issues/12), [labeled Array items](https://github.com/FlowSilver/AlgoViz/issues/13), and the [supported offline Dijkstra example](https://github.com/FlowSilver/AlgoViz/issues/14). The browser checks cover all five weighted frames and the existing BFS previews.
+The [v0.2.0 release](https://github.com/FlowSilver/AlgoViz/releases/tag/v0.2.0) shipped graph edge labels, labeled Array items, and the offline Dijkstra example. The browser checks cover all five weighted frames and the existing BFS previews. [Completed milestone](https://github.com/FlowSilver/AlgoViz/milestone/2)
 
-The [v0.3.0 milestone](https://github.com/FlowSilver/AlgoViz/milestone/3) covers [step inspection](https://github.com/FlowSilver/AlgoViz/issues/17), [TypeScript checks for the replay core](https://github.com/FlowSilver/AlgoViz/issues/18), and the [knapsack example](https://github.com/FlowSilver/AlgoViz/issues/19). The browser tests compare state and changes through forward stepping, backward stepping, and seeking.
+The [v0.3.0 release](https://github.com/FlowSilver/AlgoViz/releases/tag/v0.3.0) shipped State and Changes panels, TypeScript checks for the replay core, and the knapsack example. The browser tests compare state and changes through forward stepping, backward stepping, and seeking. [Completed milestone](https://github.com/FlowSilver/AlgoViz/milestone/3)
 
 1. Collect feedback on the [knapsack](examples/knapsack/README.md) and [weighted Dijkstra](examples/weighted-dijkstra/README.md) inspection workflows.
 2. Extend the [timed Dijkstra trial](benchmarks/dijkstra/README.md) to the planned multi-algorithm comparison and record authoring and iteration cost.
