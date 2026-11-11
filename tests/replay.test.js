@@ -170,3 +170,33 @@ test("supplied view bindings are checked only against complete states", () => {
   });
   assert.throws(() => loadReplay(input, { specText: "{}" }), ReplayError);
 });
+
+test("labeled Array item bindings validate every candidate frame before committing", () => {
+  const view = {
+    id: "distances", type: "array", source: "/distances",
+    item: { label: "/vertex", value: "/cost~1estimate", nullLabel: "∞" },
+  };
+  const specification = (view) => JSON.stringify({ version: 1, layout: "row", views: [view] });
+  const state = { distances: [{ vertex: "S", "cost/estimate": 0 }, { vertex: "U", "cost/estimate": null }] };
+  const input = trace(state,
+    step({ op: "replace", path: "/distances/1/cost~1estimate", value: 4 }),
+    step({ op: "remove", path: "/distances/1/cost~1estimate" }));
+  const replay = loadReplay(input, { specText: specification(view) });
+  assert.deepEqual(replay.current.state, state);
+  const before = replay.stepForward();
+  assert.equal(before.state.distances[1]["cost/estimate"], 4);
+  assert.throws(() => replay.stepForward(), {
+    name: "ReplayError", line: 3, viewId: "distances", path: "/distances", message: /Array item 1.*cost\/estimate/,
+  });
+  assert.deepEqual(replay.current, before);
+
+  assert.throws(() => loadReplay(trace({ distances: [{ vertex: 0, "cost/estimate": 1 }] }), { specText: specification(view) }), {
+    name: "ReplayError", line: 1, viewId: "distances", message: /Array item 0.*string label/,
+  });
+  assert.throws(() => loadReplay(input, { specText: specification({ ...view, type: "graph" }) }), {
+    name: "ReplayError", source: "visualization.json", message: /\/views\/0\/type/,
+  });
+  assert.throws(() => loadReplay(input, { specText: specification({ ...view, item: { label: "/vertex", value: "distance" } }) }), {
+    name: "ReplayError", source: "visualization.json", message: /\/views\/0\/item\/value/,
+  });
+});

@@ -24,7 +24,11 @@
         "properties": {
           "id": { "type": "string", "minLength": 1 },
           "source": { "type": "string", "minLength": 1 },
-          "target": { "type": "string", "minLength": 1 }
+          "target": { "type": "string", "minLength": 1 },
+          "label": {
+            "description": "Optional edge label. The inspector displays text and numbers, and preserves other values as trace metadata.",
+            "examples": ["shortcut", 5]
+          }
         }
       }
     }

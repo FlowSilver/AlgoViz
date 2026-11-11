@@ -1,6 +1,6 @@
 # AlgoViz protocol v1
 
-The `v0.1.0` inspector consumes a JSON Visualization Specification and a JSONL Execution Trace for one run. The spec and the trace's initial record both declare `version: 1`. Reject missing, unsupported, or mismatched versions. Encode both files as UTF-8 without a byte order mark. Reject duplicate member names in JSON objects so each binding and update has a single interpretation.
+The inspector consumes a JSON Visualization Specification and a JSONL Execution Trace for one run. The spec and the trace's initial record both declare `version: 1`. Reject missing, unsupported, or mismatched versions. Encode both files as UTF-8 without a byte order mark. Reject duplicate member names in JSON objects so each binding and update has a single interpretation.
 
 ## Visualization Specification
 
@@ -8,10 +8,25 @@ Validate the spec against the [Visualization Specification schema](../schemas/vi
 
 | View type | Data at `source` |
 | --- | --- |
-| `graph` | A graph with `nodes` and `edges` arrays. Nodes have stable `id` values and optional `label` and `status` text. Each edge has a stable `id` plus `source` and `target` node IDs. [Graph view data schema](../schemas/graph-view-data.schema.json) |
-| `array` | A JSON array in display order. For a frontier queue, index `0` holds the next item. |
+| `graph` | A graph with `nodes` and `edges` arrays. Nodes have stable `id` values and optional `label` and `status` text. Each edge has a stable `id` plus `source` and `target` node IDs. Starting in `v0.2.0`, text and numeric values in `edge.label` appear beside the edge. Other values remain valid graph metadata. [Graph view data schema](../schemas/graph-view-data.schema.json) |
+| `array` | A JSON array in display order. For a frontier queue, index `0` holds the next item. Starting in `v0.2.0`, an optional `item` binding displays a label and value for each entry. |
 
 Use unique node IDs and unique edge IDs within a graph. Both endpoints of each edge must resolve to nodes in that graph at the same step. Keep an element's ID stable as its data changes. Resolve and validate every binding at step 0 and after applying all updates in each subsequent step. Each view reads the same committed state.
+
+### Labeled Array items
+
+An Array view's `item.label` and `item.value` are JSON Pointers evaluated against each array entry. The label resolves to a string and the value resolves to any JSON value. Both pointers must resolve in every frame. `item.nullLabel` sets the display text for an explicit `null` value. It defaults to `—`.
+
+```json
+{
+  "id": "tentative-distances",
+  "type": "array",
+  "source": "/distances",
+  "item": { "label": "/vertex", "value": "/distance", "nullLabel": "∞" }
+}
+```
+
+The entry `{"vertex":"S","distance":0}` displays `S` with value `0`. The entry `{"vertex":"U","distance":null}` displays `U` with `∞`. Array views without `item` display their entries directly, including the original `v0.1.0` specs.
 
 ## Execution Trace
 

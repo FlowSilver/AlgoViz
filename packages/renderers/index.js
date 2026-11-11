@@ -1,3 +1,5 @@
+import { resolveArrayItem } from "../core/json-pointer.js";
+
 const svgNamespace = "http://www.w3.org/2000/svg";
 const nodeRadius = 21;
 
@@ -25,6 +27,17 @@ function edgePath(source, target) {
   return `M ${source.x + dx * start} ${source.y + dy * start} L ${target.x - dx * end} ${target.y - dy * end}`;
 }
 
+function edgeLabelPosition(source, target, lane) {
+  if (source === target) return { x: source.x + 34 + lane * 15, y: source.y - 42 };
+  const dx = target.x - source.x;
+  const dy = target.y - source.y;
+  const offset = (10 + lane * 14) / Math.hypot(dx, dy);
+  return {
+    x: (source.x + target.x) / 2 + dy * offset,
+    y: (source.y + target.y) / 2 - dx * offset,
+  };
+}
+
 export function renderGraph({ nodes, edges }, title, viewIndex) {
   if (nodes.length === 0) return empty("No nodes");
 
@@ -47,13 +60,29 @@ export function renderGraph({ nodes, edges }, title, viewIndex) {
   defs.append(marker);
   graph.append(defs);
 
+  const edgeLabels = svgElement("g");
+  const labelLanes = new Map();
   for (const edge of edges) {
-    const path = svgElement("path", { class: "graph-edge", "data-edge-id": edge.id, "marker-end": `url(#${arrowId})`, d: edgePath(positions.get(edge.source), positions.get(edge.target)) });
+    const source = positions.get(edge.source);
+    const target = positions.get(edge.target);
+    const path = svgElement("path", { class: "graph-edge", "data-edge-id": edge.id, "marker-end": `url(#${arrowId})`, d: edgePath(source, target) });
+    const label = typeof edge.label === "string" || typeof edge.label === "number" ? String(edge.label) : "";
     const description = svgElement("title");
-    description.textContent = `${edge.source} → ${edge.target}`;
+    description.textContent = `${edge.source} → ${edge.target}${label ? ` (${label})` : ""}`;
     path.append(description);
     graph.append(path);
+
+    if (label) {
+      const key = JSON.stringify([edge.source, edge.target]);
+      const lane = labelLanes.get(key) ?? 0;
+      labelLanes.set(key, lane + 1);
+      const position = edgeLabelPosition(source, target, lane);
+      const text = svgElement("text", { ...position, class: "graph-edge-label", "data-edge-label-for": edge.id });
+      text.textContent = shorten(label, 18);
+      edgeLabels.append(text);
+    }
   }
+  if (edgeLabels.childElementCount) graph.append(edgeLabels);
 
   for (const node of ordered) {
     const { x, y } = positions.get(node.id);
@@ -82,17 +111,29 @@ function empty(message) {
   return paragraph;
 }
 
-export function renderArray(values) {
+export function renderArray(values, binding) {
   if (values.length === 0) return empty("Empty");
   const list = document.createElement("ol");
-  list.className = "array";
-  for (const value of values) {
+  list.className = binding ? "array array--labeled" : "array";
+  for (const entry of values) {
     const item = document.createElement("li");
-    const label = document.createElement("code");
+    let value = entry;
+    if (binding) {
+      const resolved = resolveArrayItem(entry, binding);
+      value = resolved.value;
+      const label = document.createElement("span");
+      label.className = "array-label";
+      label.textContent = resolved.label;
+      item.dataset.label = resolved.label;
+      item.append(label);
+    }
+
+    const display = document.createElement("code");
     const json = JSON.stringify(value);
-    label.textContent = typeof value === "string" && value !== "" ? value : json;
     item.dataset.value = json;
-    item.append(label);
+    display.textContent = typeof value === "string" && value !== "" ? value : json;
+    if (binding && value === null) display.textContent = binding.nullLabel ?? "—";
+    item.append(display);
     list.append(item);
   }
   return list;

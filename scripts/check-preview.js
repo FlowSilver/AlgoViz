@@ -40,6 +40,7 @@ async function checkFixture(browser, file, expected) {
     assert.deepEqual(Object.fromEntries(nodes.map(({ id, status }) => [id, status])), target.nodeStatus);
     assert.deepEqual(nodes.map(({ position }) => position), positions);
     assert.deepEqual(await page.locator("[data-edge-id]").evaluateAll((edges) => edges.map((edge) => edge.dataset.edgeId)), expected.edges.map((edge) => edge.id));
+    assert.equal(await page.locator("[data-edge-label-for]").count(), 0);
     const values = await page.locator(".array [data-value]").evaluateAll((items) => items.map((item) => JSON.parse(item.dataset.value)));
     assert.deepEqual(values, target.frontier);
   }
@@ -112,4 +113,55 @@ test("the upstream BFS adapter preserves the result and its generated run replay
   const browser = await chromium.launch({ channel: process.env.ALGOVIZ_BROWSER_CHANNEL });
   t.after(() => browser.close());
   await checkFixture(browser, file, expected);
+});
+
+test("edge labels and labeled Array values follow the current replay frame", async (t) => {
+  const directory = await mkdtemp(join(tmpdir(), "algoviz-labeled-views-"));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  await writeFile(join(directory, "visualization.json"), JSON.stringify({
+    version: 1, layout: "row", views: [
+      { id: "graph", type: "graph", source: "/graph" },
+      { id: "distances", type: "array", source: "/distances", item: { label: "/vertex", value: "/distance", nullLabel: "∞" } },
+    ],
+  }));
+  const records = [
+    { type: "initial", version: 1, state: {
+      graph: {
+        nodes: [{ id: "A" }, { id: "B" }],
+        edges: [
+          { id: "A-B", source: "A", target: "B", label: 0 },
+          { id: "B-B", source: "B", target: "B", label: "loop" },
+          { id: "B-A", source: "B", target: "A", label: { metadata: true } },
+        ],
+      },
+      distances: [{ vertex: "A", distance: 0 }, { vertex: "B", distance: null }],
+    } },
+    { type: "step", updates: [
+      { op: "replace", path: "/graph/edges/0/label", value: "shortcut" },
+      { op: "remove", path: "/graph/edges/1/label" },
+      { op: "replace", path: "/distances/1/distance", value: 2 },
+    ] },
+  ];
+  await writeFile(join(directory, "trace.jsonl"), records.map((record) => JSON.stringify(record)).join("\n"));
+  const file = join(directory, "labeled.html");
+  buildPreview(pathToFileURL(`${directory}/`), file);
+  const browser = await chromium.launch({ channel: process.env.ALGOVIZ_BROWSER_CHANNEL });
+  t.after(() => browser.close());
+  const page = await browser.newPage();
+  await page.goto(pathToFileURL(file).href);
+
+  const labels = page.locator("[data-edge-label-for]");
+  const itemLabels = page.locator("[data-view-id=distances] .array-label");
+  const itemValues = page.locator("[data-view-id=distances] .array code");
+  assert.deepEqual(await labels.allTextContents(), ["0", "loop"]);
+  assert.deepEqual(await itemLabels.allTextContents(), ["A", "B"]);
+  assert.deepEqual(await itemValues.allTextContents(), ["0", "∞"]);
+  await page.getByRole("button", { name: "Next" }).click();
+  assert.equal(await page.locator('[data-edge-label-for="A-B"]').textContent(), "shortcut");
+  assert.equal(await page.locator('[data-edge-label-for="B-B"]').count(), 0);
+  assert.deepEqual(await itemValues.allTextContents(), ["0", "2"]);
+  await page.getByRole("slider", { name: "Seek" }).fill("0");
+  assert.deepEqual(await labels.allTextContents(), ["0", "loop"]);
+  assert.deepEqual(await itemValues.allTextContents(), ["0", "∞"]);
+  await page.close();
 });

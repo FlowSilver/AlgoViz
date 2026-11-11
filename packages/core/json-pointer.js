@@ -28,6 +28,14 @@ export function resolvePointer(state, pointer) {
   return tokens(pointer).reduce(readMember, state);
 }
 
+export function resolveArrayItem(entry, binding) {
+  const label = resolvePointer(entry, binding.label);
+  if (typeof label !== "string") {
+    throw new Error(`Expected a string label at ${JSON.stringify(binding.label)}`);
+  }
+  return { label, value: resolvePointer(entry, binding.value) };
+}
+
 export function applyUpdate(state, { op, path, value }) {
   const parents = tokens(path);
   const key = parents.pop();
