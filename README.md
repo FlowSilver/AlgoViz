@@ -132,3 +132,7 @@ The benchmark must be **asking AI to generate a standalone visualization directl
 - Providing a universal hosted compiler/runtime for all languages in the MVP.
 - Turning the DSL into a full frontend programming language with loops, functions, and arbitrary scripting.
 
+## License
+
+AlgoViz is licensed under the [Apache License 2.0](LICENSE).
+

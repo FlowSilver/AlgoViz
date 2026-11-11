@@ -55,15 +55,9 @@ AlgoViz is general-purpose infrastructure for developers. Open source may provid
 - External contributions introduce maintenance, review, and security-response responsibilities.
 - Public code does not replace good user documentation or reliable end-to-end examples.
 
-### 2.2 License Recommendation
+### 2.2 License
 
-Consider **Apache-2.0** or **MIT** first:
-
-- **Apache-2.0:** Permissive, with an explicit patent license; appropriate for developer tools intended for broad integration.
-- **MIT:** Simple and permissive, with minimal adoption friction.
-- **GPLv3:** Places stronger copyleft requirements on derivative works; may not match the goal of broad SDK and commercial integration.
-
-**Tentative preference: Apache-2.0.** Check compatibility with dependency licenses before release. Making a GitHub repository public does not automatically grant permission to use, modify, and redistribute the code; explicitly include a `LICENSE` file.
+AlgoViz uses the [Apache License 2.0](LICENSE). Its permissive terms and explicit patent grant support broad integration. Check compatibility with dependency licenses before release.
 
 ---
 
@@ -330,7 +324,6 @@ Ensure other human developers can understand and maintain the resulting code wit
 ### Recommended for Adoption
 
 - **Open-source direction:** Recommended.
-- **License:** Prefer Apache-2.0 tentatively, pending confirmation before release.
 - **Workflow:** Lightweight SDLC + GitHub Issues + PRs + CI.
 - **Review:** Self-review plus AI assistance during solo development; no mandatory second reviewer.
 - **Code organization:** Start with a monorepo.
