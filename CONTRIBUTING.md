@@ -1,6 +1,6 @@
 # Contributing to AlgoViz
 
-AlgoViz is in pre-release design. Start with the [project overview](README.md), [design decisions](DECISIONS.md), and [v0.1.0 backlog](OPEN_SOURCE_DEVELOPMENT.md#6-mvp-v010-initial-backlog). The first implementation target is offline replay of one graph-search run with a synchronized graph and frontier queue.
+AlgoViz is in pre-release development. Start with the [project overview](README.md), [design decisions](DECISIONS.md), and [v0.1.0 backlog](OPEN_SOURCE_DEVELOPMENT.md#6-mvp-v010-initial-backlog). The first release targets offline replay of one graph-search run with a synchronized graph and frontier queue.
 
 ## Open an issue
 
@@ -17,9 +17,18 @@ Search [existing issues](https://github.com/FlowSilver/AlgoViz/issues) before op
 3. Describe how you verified the change. For documentation, check the links and examples you touched. When changing the protocol, update the affected schema, examples, and tests together as those artifacts become available.
 4. Open the pull request against `main`. If the change relies on an open design decision, explain the assumption and its impact in the description.
 
-The repository currently contains design documents and community files. Build and test instructions will be added with the first runnable module.
-
 Participation follows the [code of conduct](CODE_OF_CONDUCT.md). Contributions are made under the project's [Apache-2.0 license](LICENSE).
+
+## Run the tests
+
+From the repository root, use Node.js 22 or later:
+
+```sh
+npm ci
+npm test
+```
+
+The tests cover the [replay API](docs/protocol.md#replay-api) against the graph-search fixture and exercise invalid records, updates, and bindings. GitHub Actions runs the same commands for pull requests and pushes to `main`.
 
 ## Local pre-commit hook
 

@@ -47,3 +47,25 @@ The example traces breadth-first search from node `A`. It visits outgoing neighb
 - [Spec](../examples/graph-search/visualization.json) binds the views to `/graph` and `/frontier`.
 - [Trace](../examples/graph-search/trace.jsonl) records the initial state and four steps.
 - [Expected states](../examples/graph-search/expected-states.json) lists the fixed edge set, each node's status, and the ordered frontier at every step. Compare against these values after committing each step.
+
+## Replay API
+
+The [replay core](../packages/core/index.js) takes decoded JSONL text. Supply `specText` to validate the spec and its bindings at each reconstructed step. Optional `traceSource` and `specSource` names appear in `ReplayError` diagnostics.
+
+```js
+import { readFileSync } from "node:fs";
+import { loadReplay } from "./packages/core/index.js";
+
+const replay = loadReplay(readFileSync("examples/graph-search/trace.jsonl", "utf8"), {
+  specText: readFileSync("examples/graph-search/visualization.json", "utf8"),
+});
+
+console.log(replay.current.state.frontier); // ["A"]
+console.log(replay.stepForward().state.frontier); // ["B", "C"]
+console.log(replay.stepBackward().state.frontier); // ["A"]
+console.log(replay.seek(replay.lastStep).state.frontier); // []
+```
+
+`current`, `stepForward()`, `stepBackward()`, and `seek(step)` return detached frames containing `step`, `state`, and `events`. Stepping at an endpoint returns its current frame. Seeking outside `0` through `lastStep` throws a `RangeError`.
+
+Loading validates record structure and the initial view bindings when a spec is supplied. Navigation checks update targets and view bindings as it reconstructs steps. A failed step or seek throws a `ReplayError` and leaves the caller's current frame intact. Replay keeps the initial and current states and rebuilds earlier steps from the initial state. Decoding bytes is the caller's responsibility. The JavaScript reader rejects numbers that decode outside its finite range.
