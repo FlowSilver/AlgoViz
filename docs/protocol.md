@@ -83,4 +83,8 @@ console.log(replay.seek(replay.lastStep).state.frontier); // []
 
 `current`, `stepForward()`, `stepBackward()`, and `seek(step)` return detached frames containing `step`, `state`, and `events`. Stepping at an endpoint returns its current frame. Seeking outside `0` through `lastStep` throws a `RangeError`.
 
+The offline preview's State panel shows the selected frame's JSON state. The Changes panel compares it with the preceding recorded step using JSON Pointer paths. Step 0 is the initial state. Added or removed values display `Absent` on the missing side, while an explicit JSON `null` displays as `null`. Array entries are compared by index.
+
+`replay.changes` returns the same net comparison as detached `added`, `removed`, and `changed` records. Each record includes its path and the applicable `before` and `after` values. The comparison follows recorded step order regardless of navigation direction. Writes that cancel within a batch produce no change for that path.
+
 Loading validates record structure and the initial view bindings when a spec is supplied. Navigation checks update targets and view bindings as it reconstructs steps. A failed step or seek throws a `ReplayError` and leaves the caller's current frame intact. Replay keeps the initial and current states and rebuilds earlier steps from the initial state. Decoding bytes is the caller's responsibility. The JavaScript reader rejects numbers that decode outside its finite range.

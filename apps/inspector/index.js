@@ -1,6 +1,7 @@
 import { loadReplay } from "../../packages/core/index.js";
 import { resolvePointer } from "../../packages/core/json-pointer.js";
 import { renderArray, renderGraph } from "../../packages/renderers/index.js";
+import { attachInspection } from "./inspection.js";
 
 const error = document.getElementById("error");
 const stepLabel = document.getElementById("step");
@@ -22,6 +23,7 @@ function viewTitle(id) {
 function start() {
   const { traceText, specText, traceSource, specSource } = JSON.parse(document.getElementById("preview-data").textContent);
   const replay = loadReplay(traceText, { specText, traceSource, specSource });
+  const inspect = attachInspection(replay);
   const spec = JSON.parse(specText);
   views.dataset.layout = spec.layout;
   document.getElementById("source").textContent = traceSource;
@@ -43,12 +45,14 @@ function start() {
     return { view, title, content };
   });
 
-  function render({ step, state }) {
+  function render(frame) {
+    const { step, state } = frame;
     const nodes = panels.map(({ view, title }, index) => {
       const data = resolvePointer(state, view.source);
       return view.type === "graph" ? renderGraph(data, title, index) : renderArray(data, view.item);
     });
     for (const [index, panel] of panels.entries()) panel.content.replaceChildren(nodes[index]);
+    inspect(frame);
     stepLabel.value = `Step ${step} of ${replay.lastStep}`;
     seek.value = String(step);
     previous.disabled = step === 0;

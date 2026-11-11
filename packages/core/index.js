@@ -1,8 +1,15 @@
 import { applyUpdate } from "./json-pointer.js";
 import { checkBindings, loadTrace, loadViews, ReplayError } from "./protocol.js";
+import { diffStates } from "./state-changes.js";
+
+/** @import { JsonObject, ReplayFrame, ReplayOptions, StateChange, TraceRecords, ViewSpec } from "./types.js" */
 
 export { ReplayError } from "./protocol.js";
 
+/**
+ * @param {string} traceText
+ * @param {ReplayOptions} [options]
+ */
 export function loadReplay(traceText, {
   traceSource = "trace.jsonl",
   specText,
@@ -17,8 +24,16 @@ class TraceReplay {
   #records;
   #views;
   #source;
+  /** @type {ReplayFrame} */
   #frame;
+  /** @type {JsonObject | undefined} */
+  #previousState;
 
+  /**
+   * @param {TraceRecords} records
+   * @param {ViewSpec[]} views
+   * @param {string} source
+   */
   constructor(records, views, source) {
     this.#records = records;
     this.#views = views;
@@ -36,6 +51,11 @@ class TraceReplay {
     return this.#records.length - 1;
   }
 
+  /** @returns {StateChange[]} */
+  get changes() {
+    return this.#previousState ? structuredClone(diffStates(this.#previousState, this.#frame.state)) : [];
+  }
+
   stepForward() {
     return this.seek(Math.min(this.#frame.step + 1, this.lastStep));
   }
@@ -44,6 +64,7 @@ class TraceReplay {
     return this.seek(Math.max(this.#frame.step - 1, 0));
   }
 
+  /** @param {number} step */
   seek(step) {
     if (!Number.isInteger(step) || step < 0 || step > this.lastStep) {
       throw new RangeError(`Step must be an integer from 0 through ${this.lastStep}`);
@@ -52,13 +73,18 @@ class TraceReplay {
 
     const start = step > this.#frame.step ? this.#frame : { step: 0, state: this.#records[0].state };
     const candidate = structuredClone(start.state);
+    /** @type {JsonObject | undefined} */
+    let previousState;
     for (let next = start.step + 1; next <= step; next++) {
       const line = next + 1;
-      for (const [operationIndex, update] of this.#records[next].updates.entries()) {
+      const record = this.#records[next];
+      if (record.type !== "step") throw new Error(`Missing step record at line ${line}`);
+      if (next === step) previousState = next === start.step + 1 ? start.state : structuredClone(candidate);
+      for (const [operationIndex, update] of record.updates.entries()) {
         try {
           applyUpdate(candidate, update);
         } catch (error) {
-          throw new ReplayError(error.message, {
+          throw new ReplayError(error instanceof Error ? error.message : String(error), {
             source: this.#source, line, operationIndex, path: update.path,
           });
         }
@@ -66,8 +92,10 @@ class TraceReplay {
       checkBindings(candidate, this.#views, this.#source, line);
     }
 
-    // Keep the cursor and events together with the last state the caller reached successfully.
-    this.#frame = { step, state: candidate, events: this.#records[step].events ?? [] };
+    const record = this.#records[step];
+    // Commit the frame and its comparison baseline only after successful validation.
+    this.#frame = { step, state: candidate, events: record.type === "step" ? record.events ?? [] : [] };
+    this.#previousState = previousState;
     return this.current;
   }
 }

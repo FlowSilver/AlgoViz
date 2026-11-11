@@ -1,8 +1,16 @@
+/** @import { ItemBinding, JsonObject, JsonValue, StateUpdate } from "./types.js" */
+
+/** @param {string} pointer */
 function tokens(pointer) {
   if (pointer === "") return [];
   return pointer.slice(1).split("/").map((token) => token.replaceAll("~1", "/").replaceAll("~0", "~"));
 }
 
+/**
+ * @param {JsonValue[]} array
+ * @param {string} token
+ * @param {boolean} [inserting]
+ */
 function arrayIndex(array, token, inserting = false) {
   if (inserting && token === "-") return array.length;
   if (!/^(?:0|[1-9][0-9]*)$/.test(token)) {
@@ -15,6 +23,11 @@ function arrayIndex(array, token, inserting = false) {
   return index;
 }
 
+/**
+ * @param {JsonValue} parent
+ * @param {string} key
+ * @returns {JsonValue}
+ */
 function readMember(parent, key) {
   if (Array.isArray(parent)) return parent[arrayIndex(parent, key)];
   if (parent === null || typeof parent !== "object") {
@@ -24,10 +37,18 @@ function readMember(parent, key) {
   return parent[key];
 }
 
+/**
+ * @param {JsonValue} state
+ * @param {string} pointer
+ */
 export function resolvePointer(state, pointer) {
   return tokens(pointer).reduce(readMember, state);
 }
 
+/**
+ * @param {JsonValue} entry
+ * @param {ItemBinding} binding
+ */
 export function resolveArrayItem(entry, binding) {
   const label = resolvePointer(entry, binding.label);
   if (typeof label !== "string") {
@@ -36,9 +57,14 @@ export function resolveArrayItem(entry, binding) {
   return { label, value: resolvePointer(entry, binding.value) };
 }
 
+/**
+ * @param {JsonObject} state
+ * @param {StateUpdate} update
+ */
 export function applyUpdate(state, { op, path, value }) {
   const parents = tokens(path);
   const key = parents.pop();
+  if (key === undefined) throw new Error("Update path must name a state member");
   const parent = parents.reduce(readMember, state);
 
   if (Array.isArray(parent)) {
@@ -49,10 +75,10 @@ export function applyUpdate(state, { op, path, value }) {
     return;
   }
 
-  if (op !== "add") readMember(parent, key);
-  else if (parent === null || typeof parent !== "object") {
-    throw new Error(`Cannot add member ${JSON.stringify(key)} to a scalar`);
+  if (parent === null || typeof parent !== "object") {
+    throw new Error(`Cannot update member ${JSON.stringify(key)} on a scalar`);
   }
+  if (op !== "add") readMember(parent, key);
 
   if (op === "remove") {
     delete parent[key];
