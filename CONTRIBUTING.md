@@ -1,6 +1,6 @@
 # Contributing to AlgoViz
 
-AlgoViz is in pre-release development. Start with the [project overview](README.md), [design decisions](DECISIONS.md), and [v0.1.0 backlog](OPEN_SOURCE_DEVELOPMENT.md#6-mvp-v010-initial-backlog). The first release targets offline replay of one graph-search run with a synchronized graph and frontier queue.
+Start with the [project overview](README.md), [design decisions](DECISIONS.md), and [release plan](OPEN_SOURCE_DEVELOPMENT.md#12-next-steps). The [BFS example](examples/upstream-bfs/README.md) and [Dijkstra example](examples/weighted-dijkstra/README.md) demonstrate the unweighted and weighted workflows.
 
 ## Open an issue
 
@@ -30,7 +30,7 @@ npm test
 
 The tests cover the [replay API](docs/protocol.md#replay-api) against the graph-search fixture and exercise invalid records, updates, and bindings. GitHub Actions runs the same commands for pull requests and pushes to `main`.
 
-To verify the offline inspector and the upstream BFS example, install Python 3.10 or later, run `npx playwright install chromium`, and then run `npm run test:browser`. Set `ALGOVIZ_BROWSER_CHANNEL=msedge` or `chrome` to use a locally installed browser. Set `ALGOVIZ_PYTHON` if your Python executable is named differently.
+To regenerate the BFS and Dijkstra runs and verify the offline inspector, install Python 3.10 or later, run `npx playwright install chromium`, and then run `npm run test:browser`. Set `ALGOVIZ_BROWSER_CHANNEL=msedge` or `chrome` to use a locally installed browser. Set `ALGOVIZ_PYTHON` if your Python executable is named differently.
 
 ## Local pre-commit hook
 
