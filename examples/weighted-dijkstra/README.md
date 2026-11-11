@@ -12,11 +12,13 @@ npm run algoviz -- validate examples/weighted-dijkstra/visualization.json exampl
 npm run algoviz -- preview examples/weighted-dijkstra/visualization.json examples/weighted-dijkstra/trace.jsonl
 ```
 
-Open the printed file URL in a browser. The Graph view displays weights beside their edges. The Frontier shows the live queue in pop order. Tentative distances use `∞` for a vertex that has yet to be reached. Both Array views bind the vertex ID and numeric distance directly from the trace. All three views read the same replay frame.
+Open the printed file URL in a browser. The Graph view displays weights beside their edges. The Frontier shows the live queue in pop order. Tentative distances use `∞` for a vertex that has yet to be reached. Both Array views bind the vertex ID and numeric distance directly from the trace. At step 2, **Changes** shows A's distance falling from `5` to `2` at `/distances/1/distance`. Expand **State** to see the full frame.
 
 ## Record the run again
 
-Use Python 3.10 or later to regenerate the spec and trace in another directory:
+The adapter reads the [benchmark fixture](../../benchmarks/dijkstra/fixture.json). To try another input, change its `source`, `vertices`, or `edges` in your local checkout. Edge weights are nonnegative, and every endpoint must name a listed vertex. The regression tests use the original fixture and expected frames.
+
+Use Python 3.10 or later to regenerate the spec and trace in a separate output directory:
 
 ```sh
 python -B examples/weighted-dijkstra/adapter.py dijkstra-run

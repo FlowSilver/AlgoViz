@@ -1,9 +1,28 @@
 # AlgoViz
 
 **AI-Native Algorithm Execution Inspector**  
-*A reusable runtime for observing, replaying, debugging, and comparing arbitrary algorithm executions.*
+*A local runtime for replaying and inspecting recorded algorithm executions.*
 
-> Status: v0.3.0 adds State and Changes panels to offline previews, with a knapsack example alongside BFS and weighted Dijkstra.
+## Try the offline preview
+
+Download the demo HTML from the [latest release](https://github.com/FlowSilver/AlgoViz/releases/latest) and open it in your browser. Step forward, step backward, or seek. Expand **State** to inspect the recorded values and use **Changes** to compare with the preceding recorded step.
+
+To generate the [knapsack preview](examples/knapsack/README.md) from a checkout with Node.js 22 or later:
+
+```sh
+npm ci
+npm run algoviz -- validate examples/knapsack/visualization.json examples/knapsack/trace.jsonl
+npm run algoviz -- preview examples/knapsack/visualization.json examples/knapsack/trace.jsonl
+```
+
+Open the printed `file://` URL. The generated HTML embeds the trace, spec, and inspector for offline use. Pass `--output preview.html` to choose a new file path.
+
+## What ships today
+
+- **Local validation and replay.** `validate` checks a JSON visualization spec and its JSONL execution trace. `preview` builds a self-contained inspector with synchronized views and timeline controls. [v1 protocol and replay API](docs/protocol.md)
+- **Graph and Array views.** Graph edges support labels, and Array items can bind separate labels and values. The [BFS](examples/upstream-bfs/README.md) and [Dijkstra](examples/weighted-dijkstra/README.md) examples show graph state and frontier order. The [knapsack example](examples/knapsack/README.md#try-your-own-input) accepts a separate JSON input for capacity and items.
+- **Step inspection.** State shows the selected frame as JSON. Changes shows before and after values at the paths that changed from the preceding recorded step.
+- **Agent integration.** The [AlgoViz skill](.agents/skills/algoviz/SKILL.md) guides coding agents through choosing observation points, recording the trace, and verifying the result.
 
 ## Positioning
 
@@ -13,20 +32,19 @@ A researcher or developer already has an algorithm and can simply ask their pref
 
 > “Use AlgoViz to visualize my pathfinding algorithm. Show the search space, frontier queue, and cost evolution.”
 
-The agent reads the existing algorithm, identifies meaningful internal states, and creates an adapter with minimal intrusion into the original implementation. AlgoViz handles recording, validation, replay, rendering, and interactive inspection. **The user should not need to learn a visualization API or rebuild a frontend for each algorithm.**
+The agent reads the existing algorithm, identifies meaningful internal states, and creates an adapter with minimal changes to the original implementation. The adapter records the run. AlgoViz validates and replays it with reusable renderers and inspection controls.
 
 AlgoViz **does not need a built-in LLM** and is not intended to replace coding agents such as Codex or Claude Code.
 
 ## Why not just ask AI to generate a webpage?
 
-For a simple, one-off animation, AI-generated standalone code may be the better choice. AlgoViz aims to add reusable value when users need to:
+AlgoViz is designed for researchers and engineers who revisit algorithm runs and need reusable tooling for:
 
-- **Inspect, not just watch:** step forward and backward, seek to a point in time, examine state, and synchronize multiple views.
-- **Reproduce, not just execute:** save a standard execution trace for offline inspection, sharing, and reproducibility.
-- **Compare, not just present:** examine differences between inputs, runs, or algorithm versions.
-- **Reuse, not just regenerate:** rely on tested timelines, renderers, validators, and interactions rather than having AI recreate infrastructure each time.
+- Inspecting state and changes at a known step across synchronized views.
+- Saving and sharing execution traces for offline replay.
+- Reusing the timeline, renderers, and validator across algorithms.
 
-The differentiator is not that “AI cannot draw animations.” It is the hypothesis that **AI + AlgoViz can deliver a more reliable and reusable observation workflow with less effort than AI + general-purpose frontend libraries.** This hypothesis still needs testing.
+The working hypothesis is that AI + AlgoViz reduces the effort to build and revise a reliable viewer. The [BFS pilot](benchmarks/README.md) and [timed Dijkstra trial](benchmarks/dijkstra/README.md) provide early measurements.
 
 ## Target users and use cases
 
@@ -39,14 +57,14 @@ The primary audience is algorithm researchers, software engineers, and teams tha
 
 Educational sorting animations may be supported, but they are not the primary differentiator.
 
-## Intended user workflow
+## Adapt an algorithm
 
 1. The user asks an AI coding agent for a visualization in an existing repository.
-2. The agent inspects the algorithm and available state, then selects built-in renderers or creates a custom renderer.
-3. The agent creates an **adapter**: reuse callbacks, logs, or iterators when possible; otherwise introduce minimal instrumentation at meaningful points.
+2. The agent inspects the algorithm and available state, then selects Graph and Array views as appropriate.
+3. The agent creates an **adapter** by reusing callbacks, logs, or iterators where possible and adding observation hooks where needed.
 4. The instrumented run produces an **Execution Trace**; the agent also generates a **Visualization Specification**.
 5. AlgoViz validates and loads both inputs, presenting an interactive execution inspector in the browser.
-6. The user saves, shares, replays, inspects, or compares runs.
+6. The user saves or shares the trace and opens the offline HTML to inspect the run.
 
 > Principle: visualization should not alter the original algorithm's behavior. If an algorithm exposes only its final result, missing internal steps cannot be reconstructed reliably without additional instrumentation.
 
@@ -71,7 +89,7 @@ Adapter / minimal instrumentation
       validate · reconstruct · replay · sync
                   │
                   ▼
-  Renderers: Graph / Array / Grid / custom plugins
+  Graph and Array views · State and Changes panels
                   │
                   ▼
         Browser-based Algorithm Inspector
@@ -80,7 +98,7 @@ Adapter / minimal instrumentation
 ### Three core abstractions
 
 - **State:** observable algorithm data at a particular step, modeled in a serializable way with stable identities.
-- **View:** declarative mapping from data to visual components such as graphs, arrays, grids, tables, and charts.
+- **View:** declarative mapping from recorded data to a Graph or Array component.
 - **Transition:** state changes recorded in the trace, optionally augmented by semantic events for richer animation.
 
 ### Two primary inputs
@@ -92,49 +110,17 @@ Adapter / minimal instrumentation
 
 Generic state updates are the source of truth for reconstruction. Semantic events such as `node.visit` or `array.swap` may enhance animations, but must not create a conflicting second state model.
 
-## Extension model
+## Roadmap
 
-- **Built-in renderers:** start with Graph and Array. Grid and other renderers are candidates for later releases.
-- **Composed views:** drive synchronized views, such as a search graph and its frontier queue, from one trace.
-- **Custom renderer plugins:** consider a registration API after `v0.1.0`.
-- **Language-agnostic integration:** use a common protocol; start with JSON/JSONL files and add live streaming and lightweight language SDKs later if justified.
-- **AI integration:** start with CLI tools, machine-readable schemas, and agent Skill documentation; consider MCP as an optional future interface.
+Additional renderers, custom renderer registration, live trace input, and comparing separate runs are design candidates. The [open design questions](DECISIONS.md#open-design-questions) track the trade-offs. See the [development plan](OPEN_SOURCE_DEVELOPMENT.md#12-next-steps) for the completed milestones and current priorities.
 
 ## Minimum viable product (v0.1.0)
 
-The release goal is an end-to-end workflow in which a coding agent adapts an existing graph-search algorithm that has never been integrated with AlgoViz.
-
-1. Define and validate two versioned inputs, a JSON Visualization Specification and a JSONL Execution Trace. The first spec needs view selection, bindings to trace state, and a basic layout.
-2. Reconstruct one run deterministically and support forward and backward stepping and seeking to any recorded step.
-3. Ship Graph and Array renderers. The demo shows the search graph and the ordered frontier queue at the same step.
-4. Provide `validate` and `preview` commands for local files, offline browser replay, and agent-readable instructions for generating an adapter and spec.
-5. Verify that the adapted algorithm produces the same result as the original on the demo inputs and that both views match the recorded execution at known steps.
-
-Grid and other additional renderers, custom renderer plugins, live streaming, and cross-run comparison are deferred beyond `v0.1.0`.
-
-The [v1 protocol and replay API](docs/protocol.md) define both file formats and show how to inspect the graph-search fixture.
-
-## Try the offline preview
-
-From a checkout with Node.js 22 or later, open the recorded [knapsack example](examples/knapsack/README.md):
-
-```sh
-npm ci
-npm run algoviz -- validate examples/knapsack/visualization.json examples/knapsack/trace.jsonl
-npm run algoviz -- preview examples/knapsack/visualization.json examples/knapsack/trace.jsonl
-```
-
-Open the printed `file://` URL in a browser. The HTML contains the trace, spec, and inspector and runs offline. Pass `--output preview.html` to write a new file at a chosen path.
-
-Expand **State** to inspect recorded values and **Changes** to compare with the preceding recorded step. The [BFS](examples/upstream-bfs/README.md) and [weighted Dijkstra](examples/weighted-dijkstra/README.md) examples show the same inspection workflow with a graph and frontier. For another knapsack capacity or item list, follow the [custom input steps](examples/knapsack/README.md#try-your-own-input).
-
-To adapt your own algorithm, point your coding agent to the [AlgoViz skill](.agents/skills/algoviz/SKILL.md). The skill covers choosing observation points, emitting the two inputs, and checking that recording preserves the algorithm's result.
+The first release established deterministic replay, the Graph and Array views, and an end-to-end adaptation of an existing BFS implementation. [v0.1.0 release](https://github.com/FlowSilver/AlgoViz/releases/tag/v0.1.0) · [First release scope](DECISIONS.md#v010-release-scope)
 
 ## What success looks like
 
 The benchmark must be **asking AI to generate a standalone visualization directly**, not merely writing a frontend by hand. Measure time to first correct result, human interventions, correctness of displayed state, cost of adding views, value for comparing repeated runs, and performance on large traces.
-
-The [BFS viewer pilot](benchmarks/README.md) compares the standalone and AlgoViz viewers on the release example.
 
 **Key question: for complex algorithms and iterative investigation, does AlgoViz actually make visualization easier and more reliable than AI-generated standalone code?**
 
@@ -147,7 +133,7 @@ The [BFS viewer pilot](benchmarks/README.md) compares the standalone and AlgoViz
 
 ## Contributing
 
-Small graph-search examples with expected states and feedback on the [v1 protocol](docs/protocol.md) are welcome.
+Small algorithm examples with expected states and feedback on the [v1 protocol](docs/protocol.md) are welcome.
 
 - [Contributing guide](CONTRIBUTING.md) for opening issues and submitting changes.
 - [Design decisions](DECISIONS.md) and [development plan](OPEN_SOURCE_DEVELOPMENT.md) for the release scope and proposed backlog.
