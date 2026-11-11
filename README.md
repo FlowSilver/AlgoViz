@@ -112,7 +112,7 @@ Generic state updates are the source of truth for reconstruction. Semantic event
 
 ## Roadmap
 
-Additional renderers, custom renderer registration, live trace input, and comparing separate runs are design candidates. The [open design questions](DECISIONS.md#open-design-questions) track the trade-offs. See the [development plan](OPEN_SOURCE_DEVELOPMENT.md#12-next-steps) for the completed milestones and current priorities.
+The v0.4.0 milestone compares two long Q-learning runs side by side with a custom grid renderer. It starts from a [verified FrozenLake fixture](examples/frozenlake/README.md). Additional renderers and live trace input are design candidates. The [open design questions](DECISIONS.md#open-design-questions) track the trade-offs. See the [development plan](OPEN_SOURCE_DEVELOPMENT.md#12-next-steps) for the completed milestones and current priorities.
 
 ## Minimum viable product (v0.1.0)
 

@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "layout": "row",
+  "views": [
+    { "id": "episode-path", "type": "array", "source": "/path" },
+    { "id": "action-values", "type": "array", "source": "/q" }
+  ]
+}

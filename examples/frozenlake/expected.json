@@ -1,0 +1,80 @@
+{
+  "runs": {
+    "epsilon-0.1": {
+      "states": 11557,
+      "transitions": 10000,
+      "episodes": 1557,
+      "sha256": "0ac9fe0b4507c12d2e72f773a2ec3d2750d0c60f7a095cf8a38c60a8bc9b6270"
+    },
+    "epsilon-0.3": {
+      "states": 11448,
+      "transitions": 10000,
+      "episodes": 1448,
+      "sha256": "a37137cc8e8f5bda15ffca4a68cf0d6d51cd2ce83102ab3a29bcddb56b5224ec"
+    }
+  },
+  "comparison": {
+    "episode": 1008,
+    "firstDifference": {
+      "step": 5,
+      "runs": {
+        "epsilon-0.1": {
+          "traceStep": 7517,
+          "t": 5,
+          "from": 13,
+          "values": [
+            0,
+            0.902499973103404,
+            0.95,
+            0.8573749743000758
+          ],
+          "greedy": [
+            "RIGHT"
+          ],
+          "action": "RIGHT",
+          "explored": false,
+          "cell": 14,
+          "reward": 0,
+          "status": "running",
+          "episodeReturn": 0
+        },
+        "epsilon-0.3": {
+          "traceStep": 8089,
+          "t": 5,
+          "from": 13,
+          "values": [
+            0,
+            0.9024999999999999,
+            0.95,
+            0.8573749999999998
+          ],
+          "greedy": [
+            "RIGHT"
+          ],
+          "action": "LEFT",
+          "explored": true,
+          "cell": 12,
+          "reward": 0,
+          "status": "hole",
+          "episodeReturn": 0
+        }
+      }
+    },
+    "outcomes": {
+      "epsilon-0.1": {
+        "resetStep": 7512,
+        "steps": 6,
+        "return": 1,
+        "outcome": "goal",
+        "actions": "DDRDRR"
+      },
+      "epsilon-0.3": {
+        "resetStep": 8084,
+        "steps": 5,
+        "return": 0,
+        "outcome": "hole",
+        "actions": "DDRDL"
+      }
+    }
+  }
+}

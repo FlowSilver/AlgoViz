@@ -1,0 +1,12 @@
+{
+  "settings": {
+    "map": "4x4",
+    "alpha": 0.5,
+    "gamma": 0.95,
+    "minTransitions": 10000
+  },
+  "runs": [
+    { "id": "epsilon-0.1", "seed": 7, "epsilon": 0.1 },
+    { "id": "epsilon-0.3", "seed": 7, "epsilon": 0.3 }
+  ]
+}
