@@ -4,6 +4,8 @@
 >
 > Status legend: **Tentative** = current preferred direction; **To validate** = key assumption without empirical evidence; **Open** = still needs a decision.
 
+See the [project overview](README.md) for the release goal and the [contributing guide](CONTRIBUTING.md) for proposing a change to a decision.
+
 ## Decision summary
 
 | ID | Topic | Current direction | Status |

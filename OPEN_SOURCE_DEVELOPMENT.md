@@ -7,7 +7,7 @@
 
 ## 1. Executive Summary
 
-**Develop AlgoViz as an open-source project using a lightweight, iterative Software Development Life Cycle (SDLC).**
+AlgoViz is a public Apache-2.0 project. The [contributing guide](CONTRIBUTING.md) describes the current workflow. This document records the proposed development process and `v0.1.0` backlog.
 
 Recommended workflow:
 
@@ -228,9 +228,11 @@ algoviz/
 ├── README.md
 ├── LICENSE
 ├── CONTRIBUTING.md
+├── CODE_OF_CONDUCT.md
+├── SECURITY.md
 ├── .github/
 │   ├── ISSUE_TEMPLATE/
-│   ├── PULL_REQUEST_TEMPLATE.md
+│   ├── pull_request_template.md
 │   └── workflows/
 │       └── ci.yml
 ├── docs/
@@ -250,7 +252,7 @@ algoviz/
 └── tests/
 ```
 
-This is a proposed layout, not a requirement to create every directory immediately. Add directories as their corresponding modules become real.
+The root community files and GitHub templates are in place. Add source, examples, tests, and CI directories as the corresponding modules become runnable.
 
 ### 7.1 GitHub Projects
 
@@ -323,7 +325,6 @@ Ensure other human developers can understand and maintain the resulting code wit
 
 ### Recommended for Adoption
 
-- **Open-source direction:** Recommended.
 - **Workflow:** Lightweight SDLC + GitHub Issues + PRs + CI.
 - **Review:** Self-review plus AI assistance during solo development; no mandatory second reviewer.
 - **Code organization:** Start with a monorepo.
@@ -339,12 +340,10 @@ Ensure other human developers can understand and maintain the resulting code wit
 
 ## 12. Next Steps
 
-1. Create a public GitHub repository with `README`, `LICENSE`, and `CONTRIBUTING`.
-2. Create the `MVP v0.1.0` Milestone and a simple GitHub Project board.
-3. Convert the Section 6 backlog into actual Issues with specific acceptance criteria.
-4. Start with #1 product-value validation and #2 design of the minimal Spec and Trace formats.
-5. Configure CI for the first runnable module and follow Feature Branch → PR → Review → Merge.
-6. Publish the first usable demonstration and update requirements and ADRs based on the experience.
+1. Create the `v0.1.0` milestone and open an issue for the minimal Spec and Trace formats with a small graph-search fixture and expected states.
+2. Turn the remaining backlog items into issues as their acceptance criteria become clear. Add a GitHub Project board when several issues need coordination.
+3. Configure CI when the first runnable module lands. Validate replay against the fixture and compare the workflow with a standalone visualization.
+4. Publish the first usable demonstration and update requirements and design decisions based on the results.
 
 ---
 

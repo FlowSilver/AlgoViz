@@ -3,7 +3,7 @@
 **AI-Native Algorithm Execution Inspector**  
 *A reusable runtime for observing, replaying, debugging, and comparing arbitrary algorithm executions.*
 
-> Status: Concept and architecture exploration. This document describes intended capabilities, not features that have already been implemented.
+> Status: Pre-release. AlgoViz is in concept and architecture exploration. The workflow and commands below describe the planned product.
 
 ## Positioning
 
@@ -131,6 +131,14 @@ The benchmark must be **asking AI to generate a standalone visualization directl
 - Automatically inferring every internal execution step from arbitrary untouched source code.
 - Providing a universal hosted compiler/runtime for all languages in the MVP.
 - Turning the DSL into a full frontend programming language with loops, functions, and arbitrary scripting.
+
+## Contributing
+
+The first design work is the versioned visualization spec and execution trace for `v0.1.0`. Small graph-search examples with expected states and feedback on the replay contract are welcome.
+
+- [Contributing guide](CONTRIBUTING.md) for opening issues and submitting changes.
+- [Design decisions](DECISIONS.md) and [development plan](OPEN_SOURCE_DEVELOPMENT.md) for the release scope and proposed backlog.
+- [Code of conduct](CODE_OF_CONDUCT.md) and [security policy](SECURITY.md) for reporting concerns.
 
 ## License
 
