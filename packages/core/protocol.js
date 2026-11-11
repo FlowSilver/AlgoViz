@@ -180,7 +180,7 @@ export function checkBindings(state, views, source, line) {
     try {
       const value = resolvePointer(state, view.source);
       if (view.type === "graph") checkGraph(value);
-      else checkArray(value, view.item);
+      else if (view.type === "array") checkArray(value, view.item);
     } catch (error) {
       throw new ReplayError(error instanceof Error ? error.message : String(error), { source, line, viewId: view.id, path: view.source });
     }

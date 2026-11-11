@@ -20,6 +20,7 @@ Open the printed `file://` URL. The generated HTML embeds the trace, spec, and i
 ## What ships today
 
 - **Local validation and replay.** `validate` checks a JSON visualization spec and its JSONL execution trace. `preview` builds a self-contained inspector with synchronized views and timeline controls. [v1 protocol and replay API](docs/protocol.md)
+- **Side-by-side replay.** `compare` aligns two traces by episode and step in one offline HTML file. The FrozenLake example uses a custom grid renderer to investigate two verified 10,000-transition runs. [Record and compare FrozenLake](examples/frozenlake/README.md#compare-the-runs)
 - **Graph and Array views.** Graph edges support labels, and Array items can bind separate labels and values. The [BFS](examples/upstream-bfs/README.md) and [Dijkstra](examples/weighted-dijkstra/README.md) examples show graph state and frontier order. The [knapsack example](examples/knapsack/README.md#try-your-own-input) accepts a separate JSON input for capacity and items.
 - **Step inspection.** State shows the selected frame as JSON. Changes shows before and after values at the paths that changed from the preceding recorded step.
 - **Agent integration.** The [AlgoViz skill](.agents/skills/algoviz/SKILL.md) guides coding agents through choosing observation points, recording the trace, and verifying the result.
@@ -44,7 +45,7 @@ AlgoViz is designed for researchers and engineers who revisit algorithm runs and
 - Saving and sharing execution traces for offline replay.
 - Reusing the timeline, renderers, and validator across algorithms.
 
-The working hypothesis is that AI + AlgoViz reduces the effort to build and revise a reliable viewer. The [BFS pilot](benchmarks/README.md) and [timed Dijkstra trial](benchmarks/dijkstra/README.md) provide early measurements.
+The working hypothesis is that AI + AlgoViz reduces the effort to build and revise a reliable viewer. The [BFS pilot](benchmarks/README.md), [timed Dijkstra trial](benchmarks/dijkstra/README.md), and [FrozenLake comparison](benchmarks/frozenlake/README.md) report measurements.
 
 ## Target users and use cases
 
@@ -60,7 +61,7 @@ Educational sorting animations may be supported, but they are not the primary di
 ## Adapt an algorithm
 
 1. The user asks an AI coding agent for a visualization in an existing repository.
-2. The agent inspects the algorithm and available state, then selects Graph and Array views as appropriate.
+2. The agent inspects the algorithm and available state, then selects Graph, Array, or a locally registered custom renderer.
 3. The agent creates an **adapter** by reusing callbacks, logs, or iterators where possible and adding observation hooks where needed.
 4. The instrumented run produces an **Execution Trace**; the agent also generates a **Visualization Specification**.
 5. AlgoViz validates and loads both inputs, presenting an interactive execution inspector in the browser.
@@ -98,7 +99,7 @@ Adapter / minimal instrumentation
 ### Three core abstractions
 
 - **State:** observable algorithm data at a particular step, modeled in a serializable way with stable identities.
-- **View:** declarative mapping from recorded data to a Graph or Array component.
+- **View:** declarative mapping from recorded data to a Graph, Array, or registered custom component.
 - **Transition:** state changes recorded in the trace, optionally augmented by semantic events for richer animation.
 
 ### Two primary inputs
@@ -112,7 +113,7 @@ Generic state updates are the source of truth for reconstruction. Semantic event
 
 ## Roadmap
 
-The v0.4.0 milestone compares two long Q-learning runs side by side with a custom grid renderer. It starts from a [verified FrozenLake fixture](examples/frozenlake/README.md). Additional renderers and live trace input are design candidates. The [open design questions](DECISIONS.md#open-design-questions) track the trade-offs. See the [development plan](OPEN_SOURCE_DEVELOPMENT.md#12-next-steps) for the completed milestones and current priorities.
+The [v0.4.0 milestone](https://github.com/FlowSilver/AlgoViz/milestone/4) tracks the FrozenLake comparison and npm publication. See the [development plan](OPEN_SOURCE_DEVELOPMENT.md#12-next-steps) and [open design questions](DECISIONS.md#open-design-questions) for what comes next.
 
 ## Minimum viable product (v0.1.0)
 

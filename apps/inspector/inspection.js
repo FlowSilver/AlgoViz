@@ -37,11 +37,11 @@ function renderChanges(changes, step) {
   return list;
 }
 
-export function attachInspection(replay) {
-  const statePanel = document.getElementById("state-panel");
-  const changesPanel = document.getElementById("changes-panel");
-  const state = document.getElementById("state-json");
-  const changes = document.getElementById("change-list");
+export function attachInspection(replay, root) {
+  const statePanel = root.querySelector("[data-state-panel]");
+  const changesPanel = root.querySelector("[data-changes-panel]");
+  const state = root.querySelector("[data-state-json]");
+  const changes = root.querySelector("[data-change-list]");
   let frame;
 
   function updateState() {

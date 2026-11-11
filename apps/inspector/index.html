@@ -13,10 +13,15 @@
         <span id="source"></span>
       </header>
       <div class="timeline" role="group" aria-label="Replay controls">
+        <form id="episode-form" class="episode-form" hidden>
+          <label>Episode <input id="episode" type="number" min="0" step="1" value="0" required></label>
+          <button type="submit">Go</button>
+        </form>
         <div class="buttons">
           <button type="button" id="previous" disabled>Previous</button>
           <button type="button" id="next" disabled>Next</button>
         </div>
+        <button type="button" id="first-difference" hidden disabled>First differing action</button>
         <label class="seek" for="seek">
           <span>Seek</span>
           <input id="seek" type="range" min="0" max="0" value="0" disabled>
@@ -24,17 +29,38 @@
         <output id="step" for="seek" aria-live="polite">Loading trace</output>
       </div>
       <p id="error" role="alert" hidden></p>
-      <div id="views"></div>
-      <section class="inspection" aria-label="Step inspection">
-        <details id="state-panel">
-          <summary>State</summary>
-          <pre id="state-json" tabindex="0"></pre>
-        </details>
-        <details id="changes-panel" open>
-          <summary>Changes</summary>
-          <div id="change-list"></div>
-        </details>
-      </section>
+      <div id="single-run">
+        <div id="views" class="views"></div>
+        <section class="inspection" aria-label="Step inspection">
+          <details id="state-panel" data-state-panel>
+            <summary>State</summary>
+            <pre id="state-json" data-state-json tabindex="0"></pre>
+          </details>
+          <details id="changes-panel" data-changes-panel open>
+            <summary>Changes</summary>
+            <div id="change-list" data-change-list></div>
+          </details>
+        </section>
+      </div>
+      <div id="comparison" hidden></div>
+      <template id="comparison-run">
+        <section class="comparison-run">
+          <header><h2></h2><p data-run-status></p></header>
+          <div data-run-content>
+            <div class="views"></div>
+            <section class="inspection" aria-label="Step inspection">
+              <details data-state-panel>
+                <summary>State</summary>
+                <pre data-state-json tabindex="0"></pre>
+              </details>
+              <details data-changes-panel open>
+                <summary>Changes</summary>
+                <div data-change-list></div>
+              </details>
+            </section>
+          </div>
+        </section>
+      </template>
     </main>
     <script type="application/json" id="preview-data">%DATA%</script>
     <script>%SCRIPT%</script>

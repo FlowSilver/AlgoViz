@@ -14,16 +14,21 @@ export function loadReplay(traceText, {
   traceSource = "trace.jsonl",
   specText,
   specSource = "visualization.json",
+  checkpointInterval,
 } = {}) {
   const records = loadTrace(traceText, traceSource);
   const views = specText === undefined ? [] : loadViews(specText, specSource);
-  return new TraceReplay(records, views, traceSource);
+  return new TraceReplay(records, views, traceSource, checkpointInterval);
 }
 
 class TraceReplay {
   #records;
   #views;
   #source;
+  #checkpointInterval;
+  #lastCheckpoint = 0;
+  /** @type {Map<number, JsonObject>} */
+  #checkpoints = new Map();
   /** @type {ReplayFrame} */
   #frame;
   /** @type {JsonObject | undefined} */
@@ -33,11 +38,16 @@ class TraceReplay {
    * @param {TraceRecords} records
    * @param {ViewSpec[]} views
    * @param {string} source
+   * @param {number} [checkpointInterval]
    */
-  constructor(records, views, source) {
+  constructor(records, views, source, checkpointInterval) {
+    if (checkpointInterval !== undefined && (!Number.isSafeInteger(checkpointInterval) || checkpointInterval < 1)) {
+      throw new RangeError("Checkpoint interval must be a positive integer");
+    }
     this.#records = records;
     this.#views = views;
     this.#source = source;
+    this.#checkpointInterval = checkpointInterval;
     const state = records[0].state;
     checkBindings(state, views, source, 1);
     this.#frame = { step: 0, state, events: [] };
@@ -71,8 +81,14 @@ class TraceReplay {
     }
     if (step === this.#frame.step) return this.current;
 
-    const start = step > this.#frame.step ? this.#frame : { step: 0, state: this.#records[0].state };
+    const interval = this.#checkpointInterval;
+    // Start before the target to reconstruct the Changes panel's preceding state.
+    const checkpoint = interval ? Math.min(this.#lastCheckpoint, Math.floor((step - 1) / interval) * interval) : 0;
+    const start = this.#frame.step < step && this.#frame.step > checkpoint
+      ? this.#frame : { step: Math.max(checkpoint, 0), state: this.#checkpoints.get(checkpoint) ?? this.#records[0].state };
     const candidate = structuredClone(start.state);
+    /** @type {[number, JsonObject][]} */
+    const checkpoints = [];
     /** @type {JsonObject | undefined} */
     let previousState;
     for (let next = start.step + 1; next <= step; next++) {
@@ -90,12 +106,19 @@ class TraceReplay {
         }
       }
       checkBindings(candidate, this.#views, this.#source, line);
+      if (interval && next > this.#lastCheckpoint && next % interval === 0) {
+        checkpoints.push([next, structuredClone(candidate)]);
+      }
     }
 
     const record = this.#records[step];
     // Commit the frame and its comparison baseline only after successful validation.
     this.#frame = { step, state: candidate, events: record.type === "step" ? record.events ?? [] : [] };
     this.#previousState = previousState;
+    for (const [index, state] of checkpoints) {
+      this.#checkpoints.set(index, state);
+      this.#lastCheckpoint = index;
+    }
     return this.current;
   }
 }

@@ -39,6 +39,29 @@ Step 0 is the reset for episode 0. Each transition and each later reset advances
 
 The checker prints each trace's SHA-256 digest, along with the comparison below. [expected.json](expected.json) holds the expected report. The tests regenerate both runs and require an exact match.
 
+## Compare the runs
+
+Build the offline comparison from the repository root after recording both traces:
+
+```sh
+npm run algoviz -- compare examples/frozenlake/comparison.json frozenlake-runs/epsilon-0.1/trace.jsonl examples/frozenlake/comparison.json frozenlake-runs/epsilon-0.3/trace.jsonl --renderer frozenlake=examples/frozenlake/grid.js --output frozenlake.html
+```
+
+Open the printed file URL. Enter episode **1008**, select **Go**, then select **First differing action**. The grid, action values, episode path, State, and Changes all follow the selected position. At step 6, the right run shows that it ended at step 5. At episode 1500, only the left run has data. [Renderer contract](../../docs/protocol.md#custom-renderers)
+
+## Run from an npm installation
+
+The package includes the Python recorder, its FrozenLake adapter, and the comparison spec and renderer. From an empty directory with Node.js 22+ and Python 3.10+, install `@flowsilver/algoviz` when the package is available on npm. To verify an unpublished release candidate, install its packed `.tgz` in place of the registry name.
+
+```sh
+npm install @flowsilver/algoviz
+python -B node_modules/@flowsilver/algoviz/examples/frozenlake/record.py frozenlake-runs
+node node_modules/@flowsilver/algoviz/examples/frozenlake/check.mjs frozenlake-runs
+npm exec -- algoviz compare node_modules/@flowsilver/algoviz/examples/frozenlake/comparison.json frozenlake-runs/epsilon-0.1/trace.jsonl node_modules/@flowsilver/algoviz/examples/frozenlake/comparison.json frozenlake-runs/epsilon-0.3/trace.jsonl --renderer frozenlake=node_modules/@flowsilver/algoviz/examples/frozenlake/grid.js --output frozenlake.html
+```
+
+The Python module `algoviz_trace.py` has no third-party dependencies. Reuse its `TraceWriter` in an adapter by giving it a writable UTF-8 file and the initial state, then calling `step(state)` with the observed state after each transition.
+
 ## Episode 1008
 
 In episode 1008, the `ε = 0.1` run reaches the goal and the `ε = 0.3` run falls into a hole. Both runs take `DOWN`, `DOWN`, `RIGHT`, `DOWN` and reach cell 13. In both runs, the learned values there favor `RIGHT`.

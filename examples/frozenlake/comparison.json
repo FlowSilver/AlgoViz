@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "layout": "column",
+  "views": [
+    { "id": "frozenlake-grid", "type": "custom", "renderer": "frozenlake", "source": "" },
+    { "id": "episode-path", "type": "array", "source": "/path" }
+  ]
+}

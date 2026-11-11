@@ -1,0 +1,56 @@
+{
+  "environment": { "node": "24.6.0", "python": "3.13.7", "edge": "157.0.4341.46", "platform": "Windows", "processor": "Intel Core Ultra 9 285H" },
+  "standalone": {
+    "initial": {
+      "dispatchedAt": "2026-11-11T22:26:50Z",
+      "passedAt": "2026-11-11T22:30:17.755Z",
+      "failedChecks": 0,
+      "humanInterventions": 0,
+      "htmlBytes": 4436239,
+      "loadMs": 180,
+      "medianSeekMs": 0.4,
+      "p95SeekMs": 0.5
+    },
+    "followUp": {
+      "dispatchedAt": "2026-11-11T22:30:29Z",
+      "passedAt": "2026-11-11T22:31:13.264Z",
+      "failedChecks": 0,
+      "humanInterventions": 0,
+      "htmlBytes": 4436878,
+      "loadMs": 187,
+      "medianSeekMs": 0.4,
+      "p95SeekMs": 0.6
+    }
+  },
+  "algoviz": {
+    "initial": {
+      "dispatchedAt": "2026-11-11T22:27:02Z",
+      "passedAt": "2026-11-11T22:27:56.292Z",
+      "failedChecks": 0,
+      "humanInterventions": 0,
+      "htmlBytes": 11299620,
+      "sha256": "db9661467926b3bf65c141e99933285d871733b99a490aad0914585962d4193a",
+      "loadMs": 1388,
+      "medianSeekMs": 1.6,
+      "p95SeekMs": 2.6
+    },
+    "followUp": {
+      "dispatchedAt": "2026-11-11T22:30:36Z",
+      "passedAt": "2026-11-11T22:31:16.979Z",
+      "failedChecks": 0,
+      "humanInterventions": 0,
+      "htmlBytes": 11299867,
+      "loadMs": 1329,
+      "medianSeekMs": 1.7,
+      "p95SeekMs": 2.6,
+      "pinnedRebuild": {
+        "passedAt": "2026-11-11T22:32:18.436Z",
+        "htmlBytes": 11299833,
+        "sha256": "75e84ac28b8d3500eb8e04e6fa00bdb377857f85527b7f36c45e61b68619980c",
+        "loadMs": 1337,
+        "medianSeekMs": 1.6,
+        "p95SeekMs": 3.2
+      }
+    }
+  }
+}

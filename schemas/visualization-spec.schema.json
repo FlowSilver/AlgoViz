@@ -16,7 +16,8 @@
         "additionalProperties": false,
         "properties": {
           "id": { "type": "string", "minLength": 1 },
-          "type": { "enum": ["graph", "array"] },
+          "type": { "enum": ["graph", "array", "custom"] },
+          "renderer": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
           "source": { "$ref": "#/$defs/pointer" },
           "item": {
             "type": "object",
@@ -29,8 +30,17 @@
             }
           }
         },
-        "if": { "required": ["item"] },
-        "then": { "properties": { "type": { "const": "array" } } }
+        "allOf": [
+          {
+            "if": { "required": ["item"] },
+            "then": { "properties": { "type": { "const": "array" } } }
+          },
+          {
+            "if": { "properties": { "type": { "const": "custom" } } },
+            "then": { "required": ["renderer"] },
+            "else": { "not": { "required": ["renderer"] } }
+          }
+        ]
       }
     }
   },
