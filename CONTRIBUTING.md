@@ -20,3 +20,13 @@ Search [existing issues](https://github.com/FlowSilver/AlgoViz/issues) before op
 The repository currently contains design documents and community files. Build and test instructions will be added with the first runnable module.
 
 Participation follows the [code of conduct](CODE_OF_CONDUCT.md). Contributions are made under the project's [Apache-2.0 license](LICENSE).
+
+## Local pre-commit hook
+
+Run this once from your clone to enable the repository's hook:
+
+```sh
+git config --local core.hooksPath .githooks
+```
+
+The hook uses Git's built-in check for whitespace errors and leftover merge conflict markers in staged changes. If a check fails, fix the reported lines, stage the fixes, and retry the commit.
