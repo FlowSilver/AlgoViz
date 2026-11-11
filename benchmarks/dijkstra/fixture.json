@@ -1,0 +1,11 @@
+{
+  "vertices": ["S", "A", "B", "C", "U"],
+  "source": "S",
+  "edges": [
+    { "id": "S-A", "source": "S", "target": "A", "weight": 5 },
+    { "id": "S-B", "source": "S", "target": "B", "weight": 1 },
+    { "id": "B-A", "source": "B", "target": "A", "weight": 1 },
+    { "id": "B-C", "source": "B", "target": "C", "weight": 10 },
+    { "id": "A-C", "source": "A", "target": "C", "weight": 2 }
+  ]
+}
