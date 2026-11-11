@@ -15,6 +15,13 @@ function buildPreview(fixture, output) {
     "--output", output]);
 }
 
+async function checkGeneratedInputs(generated, checkedIn) {
+  for (const name of ["visualization.json", "trace.jsonl"]) {
+    const expected = (await readFile(new URL(name, checkedIn), "utf8")).replaceAll("\r\n", "\n");
+    assert.equal(await readFile(new URL(name, generated), "utf8"), expected);
+  }
+}
+
 async function checkFixture(browser, file, expected) {
   const page = await browser.newPage({ viewport: { width: 1000, height: 740 } });
   const requests = [];
@@ -30,6 +37,15 @@ async function checkFixture(browser, file, expected) {
   const next = page.getByRole("button", { name: "Next" });
   const seek = page.getByRole("slider", { name: "Seek" });
   const positions = await page.locator("[data-node-id]").evaluateAll((nodes) => nodes.map((node) => node.getAttribute("transform")));
+  const edgeLabels = expected.edges.filter((edge) => edge.label !== undefined).map((edge) => ({ id: edge.id, label: String(edge.label) }));
+
+  function viewItems(viewId) {
+    return page.locator(`[data-view-id="${viewId}"] .array li:visible`).evaluateAll((items) => items.map((item) => {
+      const value = JSON.parse(item.dataset.value);
+      const label = item.querySelector(".array-label");
+      return label ? { label: label.textContent, value, text: item.querySelector("code").textContent } : value;
+    }));
+  }
 
   async function checkStep(index) {
     const target = expected.steps[index];
@@ -40,9 +56,11 @@ async function checkFixture(browser, file, expected) {
     assert.deepEqual(Object.fromEntries(nodes.map(({ id, status }) => [id, status])), target.nodeStatus);
     assert.deepEqual(nodes.map(({ position }) => position), positions);
     assert.deepEqual(await page.locator("[data-edge-id]").evaluateAll((edges) => edges.map((edge) => edge.dataset.edgeId)), expected.edges.map((edge) => edge.id));
-    assert.equal(await page.locator("[data-edge-label-for]").count(), 0);
-    const values = await page.locator(".array [data-value]").evaluateAll((items) => items.map((item) => JSON.parse(item.dataset.value)));
-    assert.deepEqual(values, target.frontier);
+    assert.deepEqual(await page.locator("[data-edge-label-for]:visible").evaluateAll((labels) => labels.map((label) => ({
+      id: label.dataset.edgeLabelFor, label: label.textContent,
+    }))), edgeLabels);
+    assert.deepEqual(await viewItems("frontier"), target.frontier);
+    if (target.distances) assert.deepEqual(await viewItems("tentative-distances"), target.distances);
   }
 
   assert(await previous.isDisabled());
@@ -51,10 +69,14 @@ async function checkFixture(browser, file, expected) {
     await checkStep(index);
   }
   assert(await next.isDisabled());
-  await previous.click();
-  await checkStep(expected.steps.length - 2);
-  await seek.fill("1");
-  await checkStep(1);
+  for (let index = expected.steps.length - 2; index >= 0; index--) {
+    await previous.click();
+    await checkStep(index);
+  }
+  for (let index = expected.steps.length - 1; index > 0; index--) {
+    await seek.fill(String(index));
+    await checkStep(index);
+  }
   await seek.press("Home");
   await checkStep(0);
 
@@ -103,10 +125,7 @@ test("the upstream BFS adapter preserves the result and its generated run replay
   }
 
   const generated = pathToFileURL(`${join(directory, "0")}/`);
-  for (const name of ["visualization.json", "trace.jsonl"]) {
-    const checkedIn = (await readFile(new URL(name, fixture), "utf8")).replaceAll("\r\n", "\n");
-    assert.equal(await readFile(new URL(name, generated), "utf8"), checkedIn);
-  }
+  await checkGeneratedInputs(generated, fixture);
   const file = join(directory, "upstream-bfs.html");
   buildPreview(generated, file);
   const expected = JSON.parse(await readFile(new URL("expected-states.json", fixture), "utf8"));
@@ -164,4 +183,37 @@ test("edge labels and labeled Array values follow the current replay frame", asy
   assert.deepEqual(await labels.allTextContents(), ["0", "loop"]);
   assert.deepEqual(await itemValues.allTextContents(), ["0", "∞"]);
   await page.close();
+});
+
+test("the weighted Dijkstra example uses native views across all five offline frames", async (t) => {
+  const fixture = new URL("../examples/weighted-dijkstra/", import.meta.url);
+  const benchmark = new URL("../benchmarks/dijkstra/", import.meta.url);
+  const { edges } = JSON.parse(await readFile(new URL("fixture.json", benchmark), "utf8"));
+  const { result, frames } = JSON.parse(await readFile(new URL("expected.json", benchmark), "utf8"));
+  const directory = await mkdtemp(join(tmpdir(), "algoviz-weighted-dijkstra-"));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const adapter = fileURLToPath(new URL("adapter.py", fixture));
+  const observed = execFileSync(process.env.ALGOVIZ_PYTHON ?? "python", ["-B", adapter, directory], { encoding: "utf8" });
+  assert.deepEqual(JSON.parse(observed), { original: result, recorded: result, states: frames.length });
+
+  const generated = pathToFileURL(`${directory}/`);
+  await checkGeneratedInputs(generated, fixture);
+  const validation = execFileSync(process.execPath, [cli, "validate", join(directory, "visualization.json"), join(directory, "trace.jsonl")], { encoding: "utf8" });
+  assert.match(validation, /Validated 5 replay states/);
+
+  const labeledItems = (items) => items.map((item) => {
+    const [label, text] = item.split(": ");
+    return { label, text, value: text === "∞" ? null : Number(text) };
+  });
+  const expected = {
+    edges: edges.map(({ id, weight }) => ({ id, label: weight })),
+    steps: frames.map((frame) => ({
+      nodeStatus: frame.status, frontier: labeledItems(frame.frontier), distances: labeledItems(frame.distances),
+    })),
+  };
+  const file = join(directory, "dijkstra.html");
+  buildPreview(generated, file);
+  const browser = await chromium.launch({ channel: process.env.ALGOVIZ_BROWSER_CHANNEL });
+  t.after(() => browser.close());
+  await checkFixture(browser, file, expected);
 });

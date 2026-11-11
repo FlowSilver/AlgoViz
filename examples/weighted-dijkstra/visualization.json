@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "layout": "row",
+  "views": [
+    { "id": "search-graph", "type": "graph", "source": "/graph" },
+    {
+      "id": "frontier",
+      "type": "array",
+      "source": "/frontier",
+      "item": { "label": "/vertex", "value": "/distance" }
+    },
+    {
+      "id": "tentative-distances",
+      "type": "array",
+      "source": "/distances",
+      "item": { "label": "/vertex", "value": "/distance", "nullLabel": "∞" }
+    }
+  ]
+}

@@ -3,7 +3,7 @@
 **AI-Native Algorithm Execution Inspector**  
 *A reusable runtime for observing, replaying, debugging, and comparing arbitrary algorithm executions.*
 
-> Status: The v0.1.0 preview supports local validation and offline replay with synchronized Graph and Array views.
+> Status: v0.2.0 supports offline weighted graph search with native edge labels, a priority queue, and tentative distances.
 
 ## Positioning
 
@@ -114,17 +114,19 @@ Grid and other additional renderers, custom renderer plugins, live streaming, an
 
 The [v1 protocol and replay API](docs/protocol.md) define both file formats and show how to inspect the graph-search fixture.
 
-### Try the offline preview
+## Try the offline preview
 
-From a checkout with Node.js 22 or later, run the recorded [upstream BFS example](examples/upstream-bfs/README.md):
+From a checkout with Node.js 22 or later, run the recorded [weighted Dijkstra example](examples/weighted-dijkstra/README.md):
 
 ```sh
 npm ci
-npm run algoviz -- validate examples/upstream-bfs/visualization.json examples/upstream-bfs/trace.jsonl
-npm run algoviz -- preview examples/upstream-bfs/visualization.json examples/upstream-bfs/trace.jsonl
+npm run algoviz -- validate examples/weighted-dijkstra/visualization.json examples/weighted-dijkstra/trace.jsonl
+npm run algoviz -- preview examples/weighted-dijkstra/visualization.json examples/weighted-dijkstra/trace.jsonl
 ```
 
 Open the printed `file://` URL in a browser. The HTML contains the trace, spec, and inspector and runs offline. Pass `--output preview.html` to write a new file at a chosen path.
+
+The [upstream BFS example](examples/upstream-bfs/README.md) shows the original unweighted Graph and Array workflow.
 
 To adapt your own algorithm, point your coding agent to the [AlgoViz skill](.agents/skills/algoviz/SKILL.md). The skill covers choosing observation points, emitting the two inputs, and checking that recording preserves the algorithm's result.
 
@@ -154,5 +156,5 @@ Small graph-search examples with expected states and feedback on the [v1 protoco
 ## License
 
 AlgoViz is licensed under the [Apache License 2.0](LICENSE).
-The vendored BFS source retains its [upstream MIT license](examples/upstream-bfs/LICENSE-upstream.md).
+The vendored algorithms retain their upstream MIT licenses. [BFS license](examples/upstream-bfs/LICENSE-upstream.md) · [Dijkstra license](benchmarks/dijkstra/LICENSE-upstream.md)
 

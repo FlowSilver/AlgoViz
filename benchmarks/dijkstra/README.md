@@ -31,6 +31,8 @@ AlgoViz reached its first pass 23 seconds sooner in this pair. The standalone vi
 
 Use this weighted fixture to check that every edge can show its own weight through the Graph view, the frontier remains synchronized, and the existing unweighted BFS preview still renders. This would let the weighted viewer drop the separate weight legend from the spec.
 
+The [supported v0.2.0 Dijkstra example](../../examples/weighted-dijkstra/README.md) implements this proposal with native edge labels and labeled Array items. The timings above are for v0.1.0.
+
 ## Artifacts and reproduction
 
 [Download the viewer archive](viewers.zip) and extract it. Open `viewer.html` in each arm's `initial` or `follow-up` directory to replay the exact saved artifact offline. The archive also contains the build sources, algorithm result, and the AlgoViz specs and traces. All four archived viewers rebuilt byte-for-byte and passed the checker in fresh directories on the trial host.

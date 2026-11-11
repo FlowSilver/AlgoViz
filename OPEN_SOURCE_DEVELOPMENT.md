@@ -337,8 +337,10 @@ Ensure other human developers can understand and maintain the resulting code wit
 
 ## 12. Next Steps
 
-1. Collect feedback on the [`v0.1.0` release](https://github.com/FlowSilver/AlgoViz/releases/tag/v0.1.0) and [upstream BFS example](examples/upstream-bfs/README.md).
-2. Extend the [BFS viewer pilot](benchmarks/README.md) to the planned multi-algorithm comparison and record authoring and iteration cost.
+The [v0.2.0 milestone](https://github.com/FlowSilver/AlgoViz/milestone/2) covers [graph edge labels](https://github.com/FlowSilver/AlgoViz/issues/12), [labeled Array items](https://github.com/FlowSilver/AlgoViz/issues/13), and the [supported offline Dijkstra example](https://github.com/FlowSilver/AlgoViz/issues/14). The browser checks cover all five weighted frames and the existing BFS previews.
+
+1. Collect feedback on the [weighted Dijkstra workflow](examples/weighted-dijkstra/README.md).
+2. Extend the [timed Dijkstra trial](benchmarks/dijkstra/README.md) to the planned multi-algorithm comparison and record authoring and iteration cost.
 3. Turn the most important findings into issues with testable acceptance criteria.
 
 ---
