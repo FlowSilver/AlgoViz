@@ -84,7 +84,7 @@ The [v1 trace format](docs/protocol.md#execution-trace) uses `add`, `remove`, an
 
 ### D08 — Provide useful built-ins while retaining a plugin escape hatch
 
-**Decision:** Graph and Array shipped in `v0.1.0`. `v0.2.0` added optional graph edge labels and labeled Array items, and `v0.3.0` added State and Changes panels. Grid and custom renderer registration are design candidates.
+**Decision:** Graph and Array shipped in `v0.1.0`. `v0.2.0` added optional graph edge labels and labeled Array items, and `v0.3.0` added State and Changes panels. `v0.4.0` adds explicit local renderer registration and uses it for the FrozenLake grid. [Renderer contract](docs/protocol.md#custom-renderers)
 
 **Why:** These two renderers exercise synchronization between different views and cover the first integration without requiring a renderer for each algorithm.
 
@@ -137,7 +137,7 @@ The [v1 trace format](docs/protocol.md#execution-trace) uses `add`, `remove`, an
 1. **Large-scale execution:** When do we snapshot, sample, and chunk traces? How can users seek efficiently across millions of steps?
 2. **State vs. layout:** Where do graph-node coordinates live? Which layouts must reproduce deterministically?
 3. **Plugin contract:** How should version compatibility, lifecycle, capability declarations, and third-party trust be handled?
-4. **Run comparison:** How should steps align across traces—index, semantic milestone, wall-clock time, or comparable state?
+4. **Run comparison:** `v0.4.0` aligns episodic runs by episode and within-episode step. What alignment do other traces need? [Comparison contract](docs/protocol.md#comparing-two-runs)
 5. **Correctness:** How can we test that instrumentation preserves behavior and that adapters capture the right state?
 6. **Data handling:** What are the redaction and sharing conventions for large or sensitive execution traces?
 

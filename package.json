@@ -1,8 +1,22 @@
 {
-  "name": "algoviz",
-  "version": "0.3.0",
-  "private": true,
+  "name": "@flowsilver/algoviz",
+  "version": "0.4.0",
+  "description": "Validate, replay, and compare algorithm traces in a self-contained offline viewer.",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FlowSilver/AlgoViz.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "apps/inspector/",
+    "packages/",
+    "schemas/",
+    "examples/frozenlake/",
+    "docs/protocol.md"
+  ],
   "type": "module",
   "bin": {
     "algoviz": "packages/cli/index.js"
@@ -14,7 +28,7 @@
     "algoviz": "node packages/cli/index.js",
     "typecheck": "tsc -p tsconfig.json",
     "test": "node --test",
-    "test:browser": "node --test scripts/check-preview.js"
+    "test:browser": "node --test scripts/check-preview.js scripts/check-comparison.js"
   },
   "dependencies": {
     "ajv": "^8.20.0",

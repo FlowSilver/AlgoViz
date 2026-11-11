@@ -12,7 +12,8 @@ export type TraceRecords = [InitialRecord, ...StepRecord[]];
 
 export type ItemBinding = { label: string; value: string; nullLabel?: string };
 type View = { id: string; source: string };
-export type ViewSpec = (View & { type: "graph" }) | (View & { type: "array"; item?: ItemBinding });
+export type ViewSpec = (View & { type: "graph" }) | (View & { type: "array"; item?: ItemBinding })
+  | (View & { type: "custom"; renderer: string });
 export type VisualizationSpec = { version: 1; layout: "row" | "column"; views: ViewSpec[] };
 export type GraphViewData = {
   nodes: { id: string; label?: string; status?: string }[];
@@ -20,7 +21,7 @@ export type GraphViewData = {
 };
 
 export type ReplayFrame = { step: number; state: JsonObject; events: SemanticEvent[] };
-export type ReplayOptions = { traceSource?: string; specText?: string; specSource?: string };
+export type ReplayOptions = { traceSource?: string; specText?: string; specSource?: string; checkpointInterval?: number };
 export type ReplayLocation = { source: string; line?: number; operationIndex?: number; path?: string; viewId?: string };
 export type StateChange =
   | { kind: "added"; path: string; after: JsonValue }

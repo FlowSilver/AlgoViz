@@ -5,13 +5,16 @@ import { basename, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { build } from "esbuild";
+import { indexRun } from "../core/comparison.js";
 import { loadReplay } from "../core/index.js";
+import { loadViews } from "../core/protocol.js";
 
 const inspector = new URL("../../apps/inspector/", import.meta.url);
 const projectRoot = fileURLToPath(new URL("../../", import.meta.url));
 const usage = `Usage:
   algoviz validate <visualization.json> <trace.jsonl>
-  algoviz preview <visualization.json> <trace.jsonl> [--output <preview.html>]
+  algoviz preview <visualization.json> <trace.jsonl> [--output <preview.html>] [--renderer <name=file>]
+  algoviz compare <left-spec> <left-trace> <right-spec> <right-trace> [--output <preview.html>] [--renderer <name=file>]
 `;
 
 async function readUtf8(path) {
@@ -40,13 +43,20 @@ async function bundleLicenses(inputs) {
   return licenses.join("\n\n").replaceAll("-->", "-- >");
 }
 
-async function previewHtml(data) {
+async function previewHtml(data, renderer) {
+  const entry = (path) => JSON.stringify(path.replaceAll("\\", "/"));
+  const inspectorEntry = entry(fileURLToPath(new URL("index.js", inspector)));
+  const plugin = renderer ? `import render from ${entry(renderer.path)};\n` : "";
+  const registry = renderer ? `new Map([[${JSON.stringify(renderer.name)}, render]])` : "new Map()";
   const [template, styles, bundle] = await Promise.all([
     readFile(new URL("index.html", inspector), "utf8"),
     readFile(new URL("style.css", inspector), "utf8"),
     build({
       absWorkingDir: projectRoot,
-      entryPoints: [fileURLToPath(new URL("index.js", inspector))],
+      stdin: {
+        contents: `${plugin}import { start } from ${inspectorEntry};\nstart(${registry});`,
+        resolveDir: projectRoot,
+      },
       platform: "browser",
       format: "iife",
       bundle: true,
@@ -65,31 +75,60 @@ async function previewHtml(data) {
   return template.replace(/%(STYLES|DATA|SCRIPT|LICENSES)%/g, (_, name) => parts[name]);
 }
 
+function readRenderer(value) {
+  if (value === undefined) return undefined;
+  const match = /^([a-z][a-z0-9-]*)=(.+)$/.exec(value);
+  if (!match) throw new Error("Expected --renderer name=path-to-module");
+  return { name: match[1], path: resolve(match[2]) };
+}
+
+async function readRun(specPath, tracePath) {
+  const [specText, traceText] = await Promise.all([readUtf8(specPath), readUtf8(tracePath)]);
+  return { specText, traceText, traceSource: tracePath, specSource: specPath };
+}
+
 async function main() {
   const { positionals, values } = parseArgs({
     allowPositionals: true,
-    options: { help: { type: "boolean", short: "h" }, output: { type: "string" } },
+    options: { help: { type: "boolean", short: "h" }, output: { type: "string" }, renderer: { type: "string" } },
   });
   if (values.help) {
     console.log(usage.trimEnd());
     return;
   }
-  const [command, specPath, tracePath] = positionals;
-  if (positionals.length !== 3 || !["validate", "preview"].includes(command)
-      || (command === "validate" && values.output !== undefined)) {
+  const [command, ...paths] = positionals;
+  if (!["validate", "preview", "compare"].includes(command)
+      || paths.length !== (command === "compare" ? 4 : 2)
+      || (command === "validate" && (values.output !== undefined || values.renderer !== undefined))) {
     throw new Error(usage.trimEnd());
   }
 
-  const [specText, traceText] = await Promise.all([readUtf8(specPath), readUtf8(tracePath)]);
-  const replay = loadReplay(traceText, { specText, traceSource: tracePath, specSource: specPath });
-  replay.seek(replay.lastStep);
-  if (command === "validate") {
-    const count = replay.lastStep + 1;
-    console.log(`Validated ${count} replay ${count === 1 ? "state" : "states"}.`);
-    return;
+  const renderer = readRenderer(values.renderer);
+  const runs = await Promise.all([readRun(paths[0], paths[1]), ...(command === "compare" ? [readRun(paths[2], paths[3])] : [])]);
+  for (const run of runs) {
+    if (command !== "validate") {
+      for (const view of loadViews(run.specText, run.specSource)) {
+        if (view.type === "custom" && view.renderer !== renderer?.name) {
+          throw new Error(`${run.specSource}: renderer "${view.renderer}" requires --renderer ${view.renderer}=<file>`);
+        }
+      }
+    }
+    if (command === "compare") {
+      indexRun(run);
+    } else {
+      const replay = loadReplay(run.traceText, run);
+      replay.seek(replay.lastStep);
+      if (command === "validate") {
+        const count = replay.lastStep + 1;
+        console.log(`Validated ${count} replay ${count === 1 ? "state" : "states"}.`);
+        return;
+      }
+    }
   }
 
-  const html = await previewHtml({ specText, traceText, specSource: basename(specPath), traceSource: basename(tracePath) });
+  const html = await previewHtml({ runs: runs.map((run) => ({
+    ...run, traceSource: basename(run.traceSource), specSource: basename(run.specSource),
+  })) }, renderer);
   const destination = values.output === undefined
     ? join(await mkdtemp(join(tmpdir(), "algoviz-")), "preview.html")
     : resolve(values.output);

@@ -328,7 +328,7 @@ Merge documentation fixes as they are ready. Before tagging a release, run the a
 - How many algorithm categories the minimal trace protocol can represent.
 - Whether a complete DSL is necessary or a generic trace format with programmable renderers is sufficient.
 - Early demand for individual programming languages and their maintenance costs.
-- Whether real-time streaming, large-trace optimization, and cross-run comparison are near-term necessities.
+- Which long-trace workloads need more optimization and which comparison alignments are useful beyond episodic runs.
 
 ## 12. Next Steps
 
@@ -336,7 +336,7 @@ The [v0.2.0 release](https://github.com/FlowSilver/AlgoViz/releases/tag/v0.2.0) 
 
 The [v0.3.0 release](https://github.com/FlowSilver/AlgoViz/releases/tag/v0.3.0) shipped State and Changes panels, TypeScript checks for the replay core, and the knapsack example. The browser tests compare state and changes through forward stepping, backward stepping, and seeking. [Completed milestone](https://github.com/FlowSilver/AlgoViz/milestone/3)
 
-The [v0.4.0 milestone](https://github.com/FlowSilver/AlgoViz/milestone/4) asks why two seeded Q-learning runs with different exploration rates take different paths through the same FrozenLake grid. The [FrozenLake fixture](examples/frozenlake/README.md) records two 10,000-transition runs and checks them independently. Side-by-side replay, a custom grid renderer, a timed comparison with a standalone viewer, and an npm release build on it.
+The [v0.4.0 milestone](https://github.com/FlowSilver/AlgoViz/milestone/4) asks why two seeded Q-learning runs with different exploration rates take different paths through the same FrozenLake grid. The [FrozenLake example](examples/frozenlake/README.md) records and verifies both 10,000-transition runs and compares them side by side. The [FrozenLake benchmark](benchmarks/frozenlake/README.md) measures navigation on the full traces and compares authoring and follow-up time with a standalone viewer. The milestone tracks npm publication.
 
 1. Collect feedback on the [knapsack](examples/knapsack/README.md) and [weighted Dijkstra](examples/weighted-dijkstra/README.md) inspection workflows.
 2. Extend the [timed Dijkstra trial](benchmarks/dijkstra/README.md) to the planned multi-algorithm comparison and record authoring and iteration cost.

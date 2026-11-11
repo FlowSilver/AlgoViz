@@ -10,6 +10,7 @@ Validate the spec against the [Visualization Specification schema](../schemas/vi
 | --- | --- |
 | `graph` | A graph with `nodes` and `edges` arrays. Nodes have stable `id` values and optional `label` and `status` text. Each edge has a stable `id` plus `source` and `target` node IDs. Starting in `v0.2.0`, text and numeric values in `edge.label` appear beside the edge. Other values remain valid graph metadata. [Graph view data schema](../schemas/graph-view-data.schema.json) |
 | `array` | A JSON array in display order. For a frontier queue, index `0` holds the next item. Starting in `v0.2.0`, an optional `item` binding displays a label and value for each entry. |
+| `custom` | A JSON value passed to a renderer registered explicitly when building the offline preview. The required `renderer` field names that registration. |
 
 Use unique node IDs and unique edge IDs within a graph. Both endpoints of each edge must resolve to nodes in that graph at the same step. Keep an element's ID stable as its data changes. Resolve and validate every binding at step 0 and after applying all updates in each subsequent step. Each view reads the same committed state.
 
@@ -27,6 +28,20 @@ An Array view's `item.label` and `item.value` are JSON Pointers evaluated agains
 ```
 
 The entry `{"vertex":"S","distance":0}` displays `S` with value `0`. The entry `{"vertex":"U","distance":null}` displays `U` with `∞`. Array views without `item` display their entries directly, including the original `v0.1.0` specs.
+
+### Custom renderers
+
+A view such as `{"id":"lake","type":"custom","renderer":"frozenlake","source":""}` binds the whole frame to the named renderer. Names start with a lowercase letter and can contain lowercase letters, digits, and hyphens.
+
+Pass `--renderer frozenlake=./grid.js` to `preview` or `compare` to register one local browser module. Its default export is a synchronous function `(data, { id, title }) => Node` called for each displayed frame. Return a DOM node or fragment. The bound data comes from a detached replay frame and should be treated as read-only. The replay engine checks that the pointer resolves. The renderer defines the expected shape of its data.
+
+The CLI bundles the module and its browser-compatible imports into the output HTML. The spec selects a registered renderer by name. Registration and the module path come from the CLI caller. The bundled module executes as JavaScript with access to the preview page and its embedded traces, so register code you trust before opening or sharing the HTML. [FrozenLake renderer](../examples/frozenlake/grid.js)
+
+### Comparing two runs
+
+`algoviz compare <left-spec> <left-trace> <right-spec> <right-trace>` reads two v1 runs. Each state has zero-based integer `episode` and `t` fields. Both start at zero. Within an episode, `t` increases by one per trace step. A reset advances `episode` by one and sets `t` to zero. When both runs record a string at `/last/action`, the viewer can jump to the first differing action in the selected episode.
+
+The common position is the episode and its step, with steps available up to the longer run's episode length. A shorter run shows where the episode ended or that the episode is unavailable. Each run's Changes panel compares its selected state with its own preceding recorded step. [FrozenLake example](../examples/frozenlake/README.md#compare-the-runs)
 
 ## Execution Trace
 
@@ -87,4 +102,4 @@ The offline preview's State panel shows the selected frame's JSON state. The Cha
 
 `replay.changes` returns the same net comparison as detached `added`, `removed`, and `changed` records. Each record includes its path and the applicable `before` and `after` values. The comparison follows recorded step order regardless of navigation direction. Writes that cancel within a batch produce no change for that path.
 
-Loading validates record structure and the initial view bindings when a spec is supplied. Navigation checks update targets and view bindings as it reconstructs steps. A failed step or seek throws a `ReplayError` and preserves the current frame and its change baseline. Replay keeps the initial state, the selected state, and its preceding state when available. It rebuilds earlier steps from the initial state. Decoding bytes is the caller's responsibility. The JavaScript reader rejects numbers that decode outside its finite range.
+Loading validates record structure and the initial view bindings when a spec is supplied. Navigation checks update targets and view bindings as it reconstructs steps. A failed step or seek throws a `ReplayError` and preserves the current frame and its change baseline. Replay keeps the initial state, the selected state, and its preceding state when available. An optional positive integer `checkpointInterval` also caches reconstructed states at that interval for seeking. The comparison uses checkpoints every 128 trace steps. Decoding bytes is the caller's responsibility. The JavaScript reader rejects numbers that decode outside its finite range.

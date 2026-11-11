@@ -1,6 +1,6 @@
 # BFS viewer pilot
 
-The [timed Dijkstra trial](dijkstra/README.md) extends this pilot to two fresh sessions and measures authoring and iteration time.
+The [timed Dijkstra trial](dijkstra/README.md) extends this pilot to two fresh sessions and measures authoring and iteration time. The [FrozenLake comparison](frozenlake/README.md) tests the same approaches on two 10,000-transition traces with linked replay controls.
 
 This pilot compares a [standalone viewer](standalone-bfs.js) with AlgoViz on the [same observed BFS run](../examples/upstream-bfs/README.md). The observation data and correctness checks were held fixed. The standalone viewer consumes expanded snapshots and implements its own graph, frontier, and timeline. AlgoViz consumes the v1 spec and trace and uses its existing inspector.
 

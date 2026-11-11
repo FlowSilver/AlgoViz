@@ -33,7 +33,7 @@ npm test
 
 TypeScript checks the replay core's JavaScript and JSDoc contracts without emitting build output. The tests cover the [replay API](docs/protocol.md#replay-api) against the graph-search fixture and exercise invalid records, updates, and bindings. The [FrozenLake tests](examples/frozenlake/README.md#fault-injection) record two 10,000-transition runs, check them against a separate run, and confirm that an altered reward or reset is reported. Set `ALGOVIZ_PYTHON` if your Python executable is named differently. GitHub Actions runs the same commands for pull requests and pushes to `main`.
 
-To regenerate the BFS, Dijkstra, and knapsack runs and verify the offline inspector, run `npx playwright install chromium` and then `npm run test:browser`. Set `ALGOVIZ_BROWSER_CHANNEL=msedge` or `chrome` to use a locally installed browser.
+To verify the offline inspector for BFS, Dijkstra, knapsack, and the FrozenLake comparison, run `npx playwright install chromium` and then `npm run test:browser`. Set `ALGOVIZ_BROWSER_CHANNEL=msedge` or `chrome` to use a locally installed browser.
 
 ## Local pre-commit hook
 
@@ -44,3 +44,10 @@ git config --local core.hooksPath .githooks
 ```
 
 The hook uses Git's built-in check for whitespace errors and leftover merge conflict markers in staged changes. If a check fails, fix the reported lines, stage the fixes, and retry the commit.
+
+## Verify the npm release
+
+1. Run the type checks, unit tests, and browser tests against the release commit.
+2. Run `npm pack --json` and inspect the file list. Install the tarball in a clean directory, then follow the [installed FrozenLake workflow](examples/frozenlake/README.md#run-from-an-npm-installation) and open its generated HTML offline.
+3. Verify that `npm whoami` identifies an account with permission to publish under `@flowsilver`. Publish the verified tarball with `npm publish <package.tgz> --access public`.
+4. Install the exact published version from the registry in a fresh directory. Repeat the FrozenLake workflow before linking the npm package from the GitHub release.
