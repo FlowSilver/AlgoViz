@@ -340,9 +340,9 @@ Ensure other human developers can understand and maintain the resulting code wit
 
 ## 12. Next Steps
 
-1. Implement deterministic replay for the [`v0.1.0` milestone](https://github.com/FlowSilver/AlgoViz/milestone/1) using the [v1 protocol and graph-search fixture](docs/protocol.md).
+1. Build the Graph and Array views for the [`v0.1.0` milestone](https://github.com/FlowSilver/AlgoViz/milestone/1) using the [replay API and graph-search fixture](docs/protocol.md).
 2. Turn the remaining backlog items into issues as their acceptance criteria become clear. Add a GitHub Project board when several issues need coordination.
-3. Configure CI when the first runnable module lands. Validate replay against the fixture and compare the workflow with a standalone visualization.
+3. Validate the end-to-end workflow against the fixture and compare it with a standalone visualization.
 4. Publish the first usable demonstration and update requirements and design decisions based on the results.
 
 ---

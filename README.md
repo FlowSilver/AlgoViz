@@ -3,7 +3,7 @@
 **AI-Native Algorithm Execution Inspector**  
 *A reusable runtime for observing, replaying, debugging, and comparing arbitrary algorithm executions.*
 
-> Status: Pre-release. AlgoViz is in concept and architecture exploration. The workflow and commands below describe the planned product.
+> Status: Pre-release. The replay core can load a v1 trace and navigate its states. The browser inspector and CLI described below are planned.
 
 ## Positioning
 
@@ -112,7 +112,7 @@ The release goal is an end-to-end workflow in which a coding agent adapts an exi
 
 Grid and other additional renderers, custom renderer plugins, live streaming, and cross-run comparison are deferred beyond `v0.1.0`.
 
-The [v1 protocol](docs/protocol.md) defines both file formats and links to a graph-search fixture with expected states at each step.
+The [v1 protocol and replay API](docs/protocol.md) define both file formats and show how to inspect the graph-search fixture.
 
 Illustrative command shape (**not implemented**):
 
